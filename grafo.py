@@ -1,4 +1,5 @@
 from queue import *
+from heapq import *
 
 visitar_nulo = lambda a,b,c,d: True
 heuristica_nula = lambda actual,destino: 0
@@ -116,8 +117,8 @@ class Grafo(object):
 			lista_adyacentes.append(adyacente)
 		return lista_adyacentes
 	
-	def bfs(self, visitar = visitar_nulo, extra = None, inicio=None):
-		'''Realiza un recorrido BFS dentro del grafo, aplicando la funcion pasada por parametro en cada vertice visitado.
+	def recorrer(self, recorrido, visitar=visitar_nulo, extra=None, inicio=None):
+		'''Realiza un recorrido BFS o DFS dentro del grafo (segun sea indicado), aplicando la funcion pasada por parametro en cada vertice visitado.
 		Parametros:
 			- visitar: una funcion cuya firma sea del tipo: 
 					visitar(v, padre, orden, extra) -> Boolean
@@ -129,44 +130,59 @@ class Grafo(object):
 			- extra: el parametro extra que se le pasara a la funcion 'visitar'
 			- inicio: identificador del vertice que se usa como inicio. Si se indica un vertice, el recorrido se comenzara en dicho vertice, 
 			y solo se seguira hasta donde se pueda (no se seguira con los vertices que falten visitar)
+			- recorrido: sera "bfs" o "dfs"
 		Salida:
 			Tupla (padre, orden), donde :
-				- 'padre' es un diccionario que indica para un identificador, cual es el identificador del vertice padre en el recorrido BFS (None si es el inicio)
-				- 'orden' es un diccionario que indica para un identificador, cual es su orden en el recorrido BFS
+				- 'padre' es un diccionario que indica para un identificador, cual es el identificador del vertice padre en el recorrido (None si es el inicio)
+				- 'orden' es un diccionario que indica para un identificador, cual es su orden en el recorrido
 		'''
+		if recorrido != "dfs" and recorrido != "bfs":
+			raise ValueError("El parametro \"recorrido\" debe ser \"bfs\" o \"dfs\"")
+		visitados = {}
+		padre = {}
+		orden = {}
+		if inicio != None:
+			padre[inicio] = None
+			orden[inicio] = 0
+			if recorrido == "bfs":
+				self.bfs(visitar, extra, inicio, visitados, padre, orden)
+			elif recorrido == "dfs":
+				self.dfs(visitar, extra, inicio, visitados, padre, orden)
 		for v in self.grafo:
-			i.visitado = False
-		for v in self.grafo:
-			if not v.visitado:
-				self._bfs(v, visitar, extra, inicio)
-		raise NotImplementedError()
+			if v not in visitados:
+				padre[v] = None
+				orden[v] = 0
+				if recorrido == "bfs":
+					self.bfs(visitar, extra, v, visitados, padre, orden)
+				elif recorrido == "dfs":
+					self.dfs(visitar, extra, v, visitados, padre, orden)
+		return padre, orden
 
-	def _bfs(self, vertice, visitar, extra, inicio):
-		para_analizar = Queue()
-		para_analizar.put(vertice)
-		while not para_analizar.empty():
-			v = para_analizar.get()
-			for u in v
-	
-	def dfs(self, visitar = visitar_nulo, extra = None, inicio=None):
-		'''Realiza un recorrido DFS dentro del grafo, aplicando la funcion pasada por parametro en cada vertice visitado.
-		- visitar: una funcion cuya firma sea del tipo: 
-					visitar(v, padre, orden, extra) -> Boolean
-					Donde 'v' es el identificador del vertice actual, 
-					'padre' el diccionario de padres actualizado hasta el momento,
-					'orden' el diccionario de ordenes del recorrido actualizado hasta el momento, y 
-					'extra' un parametro extra que puede utilizar la funcion (cualquier elemento adicional que pueda servirle a la funcion a aplicar). 
-					La funcion aplicar devuelve True si se quiere continuar iterando, False en caso contrario.
-			- extra: el parametro extra que se le pasara a la funcion 'visitar'
-			- inicio: identificador del vertice que se usa como inicio. Si se indica un vertice, el recorrido se comenzara en dicho vertice, 
-			y solo se seguira hasta donde se pueda (no se seguira con los vertices que falten visitar)
-		Salida:
-			Tupla (padre, orden), donde :
-				- 'padre' es un diccionario que indica para un identificador, cual es el identificador del vertice padre en el recorrido DFS (None si es el inicio)
-				- 'orden' es un diccionario que indica para un identificador, cual es su orden en el recorrido DFS
-		'''
-		raise NotImplementedError()
-	
+	def bfs(self, visitar, extra, origen, visitados, padre, orden):
+		q = Queue()
+		q.put(origen)
+		visitados[origen] = True
+		while not q.empty():
+			v = q.get()
+			for u in self.adyacentes(v):
+				if u not in visitados:
+					visitados[u] = True
+					padre[u] = v
+					orden[u] = orden[v] + 1
+					q.put(u)
+					if visitar(u, padre, orden, extra) == False:
+						return
+
+	def dfs(self, visitar, extra, origen, visitados, padre, orden):
+		visitados[origen] = True
+		for w in self.adyacentes(origen):
+			if w not in visitados:
+				padre[w] = origen
+				orden[w] = orden[origen] + 1
+				if visitar(w, padre, orden, extra) == False:
+					return
+				self.dfs(visitar, extra, w, visitados, padre, orden)
+
 	def componentes_conexas(self):
 		'''Devuelve una lista de listas con componentes conexas. Cada componente conexa es representada con una lista, con los identificadores de sus vertices.
 		Solamente tiene sentido de aplicar en grafos no dirigidos, por lo que
@@ -201,7 +217,45 @@ class Grafo(object):
 		'''
 		raise NotImplementedError()
 
-g = Grafo(True)
+class Heap(object):
+
+	def __init__(self, lista=[]):
+		self.lista = lista
+		if len(self.lista) != 0:
+			heapify(self.lista)
+
+	def push(self, item):
+		heappush(self.lista, item)
+
+	def pop(self):
+		return heappop(self.lista)
+
+	def min(self):
+		return self.lista[0]
+
+	def empty(self):
+		return len(self.lista) == 0
+
+	def __len__(self):
+		return len(self.lista)
+
+	def heapify(self):
+		heapify(self.lista)
+
+def visita(v, padre, orden, extra):
+	print(v)
+	print(padre[v])
+	print(orden)
+	return True
+
+g = Grafo()
 g["Hola"] = {}
 g["Chau"] = {}
+g["Adios"] = {}
+g["Ciao"] = {}
+g["JEJE"] = {}
 g.agregar_arista("Hola", "Chau")
+g.agregar_arista("Hola", "Adios")
+g.agregar_arista("Adios", "Chau")
+g.agregar_arista("Adios", "Ciao")
+g.agregar_arista("Ciao", "JEJE")
