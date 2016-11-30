@@ -1,5 +1,7 @@
 from queue import *
 from heapq import *
+from math import inf as INFINITO
+import pdb
 
 visitar_nulo = lambda a,b,c,d: True
 heuristica_nula = lambda actual,destino: 0
@@ -19,6 +21,9 @@ class Grafo(object):
 		self.dirigido = es_dirigido
 		self.grafo = {}
 	
+	def __str__(self):
+		return str(self.grafo)
+
 	def __len__(self):
 		'''Devuelve la cantidad de vertices del grafo'''
 		cant_vertices = 0
@@ -189,7 +194,7 @@ class Grafo(object):
 		en caso de aplicarse a un grafo dirigido se lanzara TypeError'''
 		raise NotImplementedError()
 		
-	def camino_minimo(self, origen, destino, heuristica=heuristica_nula):
+	def camino_minimo(self, origen, destino=None, heuristica=heuristica_nula):
 		'''Devuelve el recorrido minimo desde el origen hasta el destino, aplicando el algoritmo de Dijkstra, o bien
 		A* en caso que la heuristica no sea nula. Parametros:
 			- origen y destino: identificadores de vertices dentro del grafo. Si alguno de estos no existe dentro del grafo, lanzara KeyError.
@@ -199,7 +204,30 @@ class Grafo(object):
 			- Listado de vertices (identificadores) ordenado con el recorrido, incluyendo a los vertices de origen y destino. 
 			En caso que no exista camino entre el origen y el destino, se devuelve None. 
 		'''
-		raise NotImplementedError()
+		if origen not in self.grafo:
+			raise KeyError(V_NOT_FOUND.format(origen))
+		if destino not in self.grafo:
+			raise KeyError(V_NOT_FOUND.format(destino))
+		q = Heap()
+		distancia = {}
+		padre = {}
+		#pdb.set_trace()
+		for v in self.grafo:
+			padre[v] = None
+			distancia[v] = INFINITO
+			q.push(v)
+			# if v == destino:
+			# 	break
+		if destino != None:
+			distancia[destino] = 0
+		while not q.empty():
+			v = q.pop()
+			for w in self.adyacentes(v):
+				if (distancia[v] + self.obtener_peso_arista(v, w)) < distancia[w]:
+					distancia[w] = distancia[v] + self.obtener_peso_arista(v, w)
+					padre[w] = v
+					q.lista.sort()
+		return distancia, padre #[destino] #if distancia[destino] != INFINITO else None
 	
 	def mst(self):
 		'''Calcula el Arbol de Tendido Minimo (MST) para un grafo no dirigido. En caso de ser dirigido, lanza una excepcion.
@@ -221,7 +249,7 @@ class Heap(object):
 
 	def __init__(self, lista=[]):
 		self.lista = lista
-		if len(self.lista) != 0:
+		if len(self.lista) > 1:
 			heapify(self.lista)
 
 	def push(self, item):
@@ -242,20 +270,21 @@ class Heap(object):
 	def heapify(self):
 		heapify(self.lista)
 
-def visita(v, padre, orden, extra):
-	print(v)
-	print(padre[v])
-	print(orden)
-	return True
+# def visita(v, padre, orden, extra):
+# 	print(v)
+# 	print(padre[v])
+# 	print(orden)
+# 	return True
 
-g = Grafo()
-g["Hola"] = {}
-g["Chau"] = {}
-g["Adios"] = {}
-g["Ciao"] = {}
-g["JEJE"] = {}
-g.agregar_arista("Hola", "Chau")
-g.agregar_arista("Hola", "Adios")
-g.agregar_arista("Adios", "Chau")
-g.agregar_arista("Adios", "Ciao")
-g.agregar_arista("Ciao", "JEJE")
+# g = Grafo()
+# g["Hola"] = {}
+# g["Chau"] = {}
+# g["Adios"] = {}
+# g["Ciao"] = {}
+# g["JEJE"] = {}
+# g.agregar_arista("Hola", "Chau")
+# g.agregar_arista("Hola", "Adios")
+# g.agregar_arista("Adios", "Chau")
+# g.agregar_arista("Adios", "Ciao")
+# g.agregar_arista("Ciao", "JEJE")
+# g.agregar_arista("JEJE", "Chau")
