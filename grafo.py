@@ -19,58 +19,61 @@ class Grafo(object):
 		if not isinstance(es_dirigido, bool):
 			raise TypeError("{} debe ser un valor booleano".format(es_dirigido))
 		self.dirigido = es_dirigido
-		self.grafo = {}
+		self.vertices = {}
 	
 	def __str__(self):
-		return str(self.grafo)
+		return str(self.vertices)
+
+	def __repr__(self):
+		return str(self)
 
 	def __len__(self):
 		'''Devuelve la cantidad de vertices del grafo'''
 		cant_vertices = 0
-		for vertice in self.grafo:
+		for vertice in self.vertices:
 			cant_vertices += 1
 		return cant_vertices
 	
 	def __iter__(self):
 		'''Devuelve un iterador de vertices, sin ningun tipo de relacion entre los consecutivos'''
-		return iter(self.grafo)
+		return iter(self.vertices)
 		
 	def keys(self):
 		'''Devuelve una lista de identificadores de vertices. Iterar sobre ellos es equivalente a iterar sobre el grafo.'''
 		lista_idvertices = []
-		for vertice in self.grafo:
+		for vertice in self.vertices:
 			lista_idvertices.append(vertice)
 		return lista_idvertices
 		
 	def __getitem__(self, id):
 		'''Devuelve el valor del vertice asociado, del identificador indicado. Si no existe el identificador en el grafo, lanzara KeyError.'''
-		return self.grafo[id]
+		return self.vertices[id]
 		
 	def __setitem__(self, id, valor):
 		'''Agrega un nuevo vertice con el par <id, valor> indicado. ID debe ser de identificador unico del vertice.
 		En caso que el identificador ya se encuentre asociado a un vertice, se actualizara el valor.
 		'''
-		self.grafo[id] = {}
+		self.vertices[id] = {}
 	
 	def __delitem__(self, id):
 		'''Elimina el vertice del grafo. Si no existe el identificador en el grafo, lanzara KeyError.
 		Borra tambien todas las aristas que salian y entraban al vertice en cuestion.
 		'''
-		if id not in self.grafo:
+		if id not in self.vertices:
 			raise KeyError(V_NOT_FOUND.format(id))
 		if not self.dirigido:
-			adyacentes = self.grafo[id]
+			adyacentes = self.vertices[id]
 			for vertice in adyacentes:
-				self.grafo[vertice].pop(id)
+				self.vertices[vertice].pop(id)
 		else:
-			for vertice in self.grafo:
-				if id in self.grafo[vertice]:
-					self.grafo[vertice].pop(id)
-		self.grafo.pop(id)
+			for vertice in self.vertices:
+				if id in self.vertices[vertice]:
+					self.vertices[vertice].pop(id)
+		self.vertices.pop(id)
 	
 	def __contains__(self, id):
 		''' Determina si el grafo contiene un vertice con el identificador indicado.'''
-		return id in self.grafo
+		return id in self.vertices
 		
 	def agregar_arista(self, desde, hasta, peso = 1):
 		'''Agrega una arista que conecta los vertices indicados. Parametros:
@@ -78,47 +81,47 @@ class Grafo(object):
 			- Peso: valor de peso que toma la conexion. Si no se indica, valdra 1.
 			Si el grafo es no-dirigido, tambien agregara la arista reciproca.
 		'''
-		if desde not in self.grafo:
+		if desde not in self.vertices:
 			raise KeyError(V_NOT_FOUND.format(desde))
-		if hasta not in self.grafo:
+		if hasta not in self.vertices:
 			raise KeyError(V_NOT_FOUND.format(hasta))
-		self.grafo[desde][hasta] = peso
+		self.vertices[desde][hasta] = peso
 		if not self.dirigido:
-			self.grafo[hasta][desde] = peso
+			self.vertices[hasta][desde] = peso
 
 	def borrar_arista(self, desde, hasta):
 		'''Borra una arista que conecta los vertices indicados. Parametros:
 			- desde y hasta: identificadores de vertices dentro del grafo. Si alguno de estos no existe dentro del grafo, lanzara KeyError.
 		   En caso de no existir la arista, se lanzara ValueError.
 		'''
-		if desde not in self.grafo or hasta not in self.grafo:
+		if desde not in self.vertices or hasta not in self.vertices:
 			raise KeyError(VS_NOT_FOUND)
-		if hasta not in self.grafo[desde]:
+		if hasta not in self.vertices[desde]:
 			raise ValueError(A_NOT_FOUND)
-		self.grafo[desde].pop(hasta)
+		self.vertices[desde].pop(hasta)
 		if not self.dirigido:
-			self.grafo[hasta].pop(desde)
+			self.vertices[hasta].pop(desde)
 
 	def obtener_peso_arista(self, desde, hasta):
 		'''Obtiene el peso de la arista que va desde el vertice 'desde', hasta el vertice 'hasta'. Parametros:
 			- desde y hasta: identificadores de vertices dentro del grafo. Si alguno de estos no existe dentro del grafo, lanzara KeyError.
 			En caso de no existir la union consultada, se devuelve None.
 		'''
-		if desde not in self.grafo:
+		if desde not in self.vertices:
 			raise KeyError(V_NOT_FOUND.format(desde))
-		if hasta not in self.grafo:
+		if hasta not in self.vertices:
 			raise KeyError(V_NOT_FOUND.format(hasta))
-		if hasta not in self.grafo[desde]:
+		if hasta not in self.vertices[desde]:
 			return None
 		else:
-			return self.grafo[desde][hasta]
+			return self.vertices[desde][hasta]
 		
 	def adyacentes(self, id):
 		'''Devuelve una lista con los vertices (identificadores) adyacentes al indicado. Si no existe el vertice, se lanzara KeyError'''
-		if id not in self.grafo:
+		if id not in self.vertices:
 			raise KeyError(V_NOT_FOUND.format(id))
 		lista_adyacentes = []
-		for adyacente in self.grafo[id]:
+		for adyacente in self.vertices[id]:
 			lista_adyacentes.append(adyacente)
 		return lista_adyacentes
 	
@@ -153,7 +156,7 @@ class Grafo(object):
 				self.bfs(visitar, extra, inicio, visitados, padre, orden)
 			elif recorrido == "dfs":
 				self.dfs(visitar, extra, inicio, visitados, padre, orden)
-		for v in self.grafo:
+		for v in self.vertices:
 			if v not in visitados:
 				padre[v] = None
 				orden[v] = 0
@@ -193,7 +196,13 @@ class Grafo(object):
 		Solamente tiene sentido de aplicar en grafos no dirigidos, por lo que
 		en caso de aplicarse a un grafo dirigido se lanzara TypeError'''
 		raise NotImplementedError()
-		
+	
+	def camino_minimo(self, origen, destino=None, heuristica=heuristica_nula):
+		if origen not in self.vertices:
+			raise KeyError(V_NOT_FOUND.format(origen))
+		if destino is not None and destino not in self.vertices:
+			raise KeyError(V_NOT_FOUND.format(destino))
+
 	def camino_minimo(self, origen, destino=None, heuristica=heuristica_nula):
 		'''Devuelve el recorrido minimo desde el origen hasta el destino, aplicando el algoritmo de Dijkstra, o bien
 		A* en caso que la heuristica no sea nula. Parametros:
@@ -204,15 +213,15 @@ class Grafo(object):
 			- Listado de vertices (identificadores) ordenado con el recorrido, incluyendo a los vertices de origen y destino. 
 			En caso que no exista camino entre el origen y el destino, se devuelve None. 
 		'''
-		if origen not in self.grafo:
+		if origen not in self.vertices:
 			raise KeyError(V_NOT_FOUND.format(origen))
-		if destino not in self.grafo:
+		if destino is not None and destino not in self.vertices:
 			raise KeyError(V_NOT_FOUND.format(destino))
 		q = Heap()
 		distancia = {}
 		padre = {}
 		#pdb.set_trace()
-		for v in self.grafo:
+		for v in self.vertices:
 			padre[v] = None
 			distancia[v] = INFINITO
 			q.push(v)
@@ -245,7 +254,31 @@ class Grafo(object):
 		'''
 		raise NotImplementedError()
 
+
+class Item(object):
+
+	def __init__(self, dato, prioridad):
+		self.dato = dato
+		self.prioridad = prioridad
+		self.visitado = False
+		self.padre = None
+
+	def __str__(self):
+		return str((self.dato, self.prioridad, self.visitado))
+
+	def __repr__(self):
+		return str((self.dato, self.prioridad, self.visitado))
+
+	def __lt__(self, otro):
+		return self.prioridad < otro.prioridad
+
+	def __gt__(self, otro):
+		return self.prioridad > otro.prioridad
+
+
 class Heap(object):
+	''' Clase wrapper que modela un Heap usando la biblioteca heapq brindada por defecto en python.
+	'''
 
 	def __init__(self, lista=[]):
 		self.lista = lista
