@@ -198,12 +198,6 @@ class Grafo(object):
 		raise NotImplementedError()
 	
 	def camino_minimo(self, origen, destino=None, heuristica=heuristica_nula):
-		if origen not in self.vertices:
-			raise KeyError(V_NOT_FOUND.format(origen))
-		if destino is not None and destino not in self.vertices:
-			raise KeyError(V_NOT_FOUND.format(destino))
-
-	def camino_minimo(self, origen, destino=None, heuristica=heuristica_nula):
 		'''Devuelve el recorrido minimo desde el origen hasta el destino, aplicando el algoritmo de Dijkstra, o bien
 		A* en caso que la heuristica no sea nula. Parametros:
 			- origen y destino: identificadores de vertices dentro del grafo. Si alguno de estos no existe dentro del grafo, lanzara KeyError.
@@ -217,26 +211,25 @@ class Grafo(object):
 			raise KeyError(V_NOT_FOUND.format(origen))
 		if destino is not None and destino not in self.vertices:
 			raise KeyError(V_NOT_FOUND.format(destino))
+		items = {}
+		for i in self:
+			if i != origen:
+				items[i] = Item(i, INFINITO)
+			else:
+				items[i] = Item(i, 0, True)
 		q = Heap()
-		distancia = {}
-		padre = {}
+		q.push(items[origen])
 		#pdb.set_trace()
-		for v in self.vertices:
-			padre[v] = None
-			distancia[v] = INFINITO
-			q.push(v)
-			# if v == destino:
-			# 	break
-		if destino != None:
-			distancia[destino] = 0
 		while not q.empty():
 			v = q.pop()
-			for w in self.adyacentes(v):
-				if (distancia[v] + self.obtener_peso_arista(v, w)) < distancia[w]:
-					distancia[w] = distancia[v] + self.obtener_peso_arista(v, w)
-					padre[w] = v
-					q.lista.sort()
-		return distancia, padre #[destino] #if distancia[destino] != INFINITO else None
+			for w in self.adyacentes(v.dato):
+				if not items[w].visitado:
+					if (items[v.dato].distancia + self.obtener_peso_arista(v.dato, w)) < items[w].distancia:
+						items[w].distancia = items[v.dato].distancia + self.obtener_peso_arista(v.dato, w)
+						items[w].padre = v.dato
+						items[w].visitado = True
+						q.push(items[w])
+		return items
 	
 	def mst(self):
 		'''Calcula el Arbol de Tendido Minimo (MST) para un grafo no dirigido. En caso de ser dirigido, lanza una excepcion.
@@ -257,23 +250,23 @@ class Grafo(object):
 
 class Item(object):
 
-	def __init__(self, dato, prioridad):
+	def __init__(self, dato, distancia, visitado=False):
 		self.dato = dato
-		self.prioridad = prioridad
-		self.visitado = False
+		self.distancia = distancia
+		self.visitado = visitado
 		self.padre = None
 
 	def __str__(self):
-		return str((self.dato, self.prioridad, self.visitado))
+		return str((self.dato, self.distancia, self.visitado))
 
 	def __repr__(self):
-		return str((self.dato, self.prioridad, self.visitado))
+		return str((self.dato, self.distancia, self.visitado, self.padre))
 
 	def __lt__(self, otro):
-		return self.prioridad < otro.prioridad
+		return self.distancia < otro.distancia
 
 	def __gt__(self, otro):
-		return self.prioridad > otro.prioridad
+		return self.distancia > otro.distancia
 
 
 class Heap(object):
@@ -309,15 +302,15 @@ class Heap(object):
 # 	print(orden)
 # 	return True
 
-# g = Grafo()
-# g["Hola"] = {}
-# g["Chau"] = {}
-# g["Adios"] = {}
-# g["Ciao"] = {}
-# g["JEJE"] = {}
-# g.agregar_arista("Hola", "Chau")
-# g.agregar_arista("Hola", "Adios")
-# g.agregar_arista("Adios", "Chau")
-# g.agregar_arista("Adios", "Ciao")
-# g.agregar_arista("Ciao", "JEJE")
-# g.agregar_arista("JEJE", "Chau")
+g = Grafo()
+g["Hola"] = {}
+g["Chau"] = {}
+g["Adios"] = {}
+g["Ciao"] = {}
+g["JEJE"] = {}
+g.agregar_arista("Hola", "Chau")
+g.agregar_arista("Hola", "Adios")
+g.agregar_arista("Adios", "Chau")
+g.agregar_arista("Adios", "Ciao")
+g.agregar_arista("Ciao", "JEJE")
+g.agregar_arista("JEJE", "Chau")
