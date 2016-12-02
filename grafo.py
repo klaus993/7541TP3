@@ -219,7 +219,6 @@ class Grafo(object):
 				items[i] = Item(i, 0, True)
 		q = Heap()
 		q.push(items[origen])
-		#pdb.set_trace()
 		while not q.empty():
 			v = q.pop()
 			for w in self.adyacentes(v.dato):
@@ -229,6 +228,9 @@ class Grafo(object):
 						items[w].padre = v.dato
 						items[w].visitado = True
 						q.push(items[w])
+						if (items[w].dato == destino):
+							while not q.empty(): q.pop()
+							break
 		return items
 	
 	def mst(self):
