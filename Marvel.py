@@ -17,10 +17,9 @@ USO = "Uso:\n\
 
 
 def main():
-	grafo = parse("marvel.pjk")
 	print("¡Bienvenido al mundo de Marvel!")
 	print(USO)
-	sleep(0.3)
+	grafo = parse("marvel.pjk")
 	while True:
 		try:
 			comando = input("> ")
