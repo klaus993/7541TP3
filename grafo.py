@@ -1,12 +1,13 @@
 from queue import *
 from heapq import *
-from random import randrange, choice
+from itertools import repeat
+import random
 import pdb
 
 INFINITO = float('inf')
 
-visitar_nulo = lambda a,b,c,d: True
-heuristica_nula = lambda actual,destino: 0
+visitar_nulo = lambda a, b, c, d: True
+heuristica_nula = lambda actual, destino: 0
 
 VS_NOT_FOUND = "Algun/ambos vertice/s pasados no se encuentra/n en el grafo"
 V_NOT_FOUND = "El vertice {} no se encuentra en el grafo."
@@ -221,6 +222,7 @@ class Grafo(object):
 				items[i] = Item(i, 0, True)
 		q = Heap()
 		q.push(items[origen])
+		cortar = False
 		while not q.empty():
 			v = q.pop()
 			for w in self.adyacentes(v.dato):
@@ -231,8 +233,10 @@ class Grafo(object):
 						items[w].visitado = True
 						q.push(items[w])
 						if (items[w].dato == destino):
-							while not q.empty(): q.pop()
+							cortar = True
 							break
+			if cortar:
+				break
 		return items
 
 	def mst(self):
@@ -251,19 +255,23 @@ class Grafo(object):
 		'''
 		walk = []
 		i = 0
-		if origen is not None:
-			actual = self.adyacentes(origen)
-		else:
-			origen = choice(list(self.vertices.keys()))
-			actual = self.adyacentes(origen)
-		walk.append(origen)
-		while (i < largo):
-			walk.append(choice(actual))
-			actual = self.adyacentes(choice(actual))
+		if origen is None:
+			origen = random.choice(list(self.vertices.keys()))
+		actual = origen
+		walk.append(actual)
+		while i < largo:
+			if pesado:
+				lista = []
+				for p in self[actual]:
+					lista.extend(repeat(p, self[actual][p]))
+				print(i, largo)
+				print(len(lista))
+				actual = random.choice(lista)
+			else:
+				actual = random.choice(self.adyacentes(actual))
+			walk.append(actual)
 			i += 1
 		return walk
-
-		raise NotImplementedError()
 
 
 class Item(object):
