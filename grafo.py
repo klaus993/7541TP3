@@ -1,7 +1,9 @@
 from queue import *
 from heapq import *
-from math import inf as INFINITO
+from random import randrange, choice
 import pdb
+
+INFINITO = float('inf')
 
 visitar_nulo = lambda a,b,c,d: True
 heuristica_nula = lambda actual,destino: 0
@@ -13,14 +15,14 @@ A_NOT_FOUND = "La arista a borrar no se encuentra en el grafo."
 class Grafo(object):
 	'''Clase que representa un grafo. El grafo puede ser dirigido, o no, y puede no indicarsele peso a las aristas
 	(se comportara como peso = 1). Implementado como "diccionario de diccionarios"'''
-	
-	def __init__(self, es_dirigido = False):
+
+	def __init__(self, es_dirigido=False):
 		'''Crea el grafo. El parametro 'es_dirigido' indica si sera dirigido, o no.'''
 		if not isinstance(es_dirigido, bool):
 			raise TypeError("{} debe ser un valor booleano".format(es_dirigido))
 		self.dirigido = es_dirigido
 		self.vertices = {}
-	
+
 	def __str__(self):
 		return str(self.vertices)
 
@@ -33,28 +35,28 @@ class Grafo(object):
 		for vertice in self.vertices:
 			cant_vertices += 1
 		return cant_vertices
-	
+
 	def __iter__(self):
 		'''Devuelve un iterador de vertices, sin ningun tipo de relacion entre los consecutivos'''
 		return iter(self.vertices)
-		
+
 	def keys(self):
 		'''Devuelve una lista de identificadores de vertices. Iterar sobre ellos es equivalente a iterar sobre el grafo.'''
 		lista_idvertices = []
 		for vertice in self.vertices:
 			lista_idvertices.append(vertice)
 		return lista_idvertices
-		
+
 	def __getitem__(self, id):
 		'''Devuelve el valor del vertice asociado, del identificador indicado. Si no existe el identificador en el grafo, lanzara KeyError.'''
 		return self.vertices[id]
-		
+
 	def __setitem__(self, id, valor):
 		'''Agrega un nuevo vertice con el par <id, valor> indicado. ID debe ser de identificador unico del vertice.
 		En caso que el identificador ya se encuentre asociado a un vertice, se actualizara el valor.
 		'''
 		self.vertices[id] = {}
-	
+
 	def __delitem__(self, id):
 		'''Elimina el vertice del grafo. Si no existe el identificador en el grafo, lanzara KeyError.
 		Borra tambien todas las aristas que salian y entraban al vertice en cuestion.
@@ -70,11 +72,11 @@ class Grafo(object):
 				if id in self.vertices[vertice]:
 					self.vertices[vertice].pop(id)
 		self.vertices.pop(id)
-	
+
 	def __contains__(self, id):
 		''' Determina si el grafo contiene un vertice con el identificador indicado.'''
 		return id in self.vertices
-		
+
 	def agregar_arista(self, desde, hasta, peso = 1):
 		'''Agrega una arista que conecta los vertices indicados. Parametros:
 			- desde y hasta: identificadores de vertices dentro del grafo. Si alguno de estos no existe dentro del grafo, lanzara KeyError.
@@ -115,7 +117,7 @@ class Grafo(object):
 			return None
 		else:
 			return self.vertices[desde][hasta]
-		
+
 	def adyacentes(self, id):
 		'''Devuelve una lista con los vertices (identificadores) adyacentes al indicado. Si no existe el vertice, se lanzara KeyError'''
 		if id not in self.vertices:
@@ -124,7 +126,7 @@ class Grafo(object):
 		for adyacente in self.vertices[id]:
 			lista_adyacentes.append(adyacente)
 		return lista_adyacentes
-	
+
 	def recorrer(self, recorrido, visitar=visitar_nulo, extra=None, inicio=None):
 		'''Realiza un recorrido BFS o DFS dentro del grafo (segun sea indicado), aplicando la funcion pasada por parametro en cada vertice visitado.
 		Parametros:
@@ -196,7 +198,7 @@ class Grafo(object):
 		Solamente tiene sentido de aplicar en grafos no dirigidos, por lo que
 		en caso de aplicarse a un grafo dirigido se lanzara TypeError'''
 		raise NotImplementedError()
-	
+
 	def camino_minimo(self, origen, destino=None, heuristica=heuristica_nula):
 		'''Devuelve el recorrido minimo desde el origen hasta el destino, aplicando el algoritmo de Dijkstra, o bien
 		A* en caso que la heuristica no sea nula. Parametros:
@@ -232,13 +234,13 @@ class Grafo(object):
 							while not q.empty(): q.pop()
 							break
 		return items
-	
+
 	def mst(self):
 		'''Calcula el Arbol de Tendido Minimo (MST) para un grafo no dirigido. En caso de ser dirigido, lanza una excepcion.
 		Devuelve: un nuevo grafo, con los mismos vertices que el original, pero en forma de MST.'''
 		raise NotImplementedError()
-	
-	def random_walk(self, largo, origen = None, pesado = False):
+
+	def random_walk(self, largo, origen=None, pesado=False):
 		''' Devuelve una lista con un recorrido aleatorio de grafo.
 			Parametros:
 				- largo: El largo del recorrido a realizar
@@ -247,6 +249,20 @@ class Grafo(object):
 			Devuelve:
 				Una lista con los vertices (ids) recorridos, en el orden del recorrido. 
 		'''
+		walk = []
+		i = 0
+		if origen is not None:
+			actual = self.adyacentes(origen)
+		else:
+			origen = choice(list(self.vertices.keys()))
+			actual = self.adyacentes(origen)
+		walk.append(origen)
+		while (i < largo):
+			walk.append(choice(actual))
+			actual = self.adyacentes(choice(actual))
+			i += 1
+		return walk
+
 		raise NotImplementedError()
 
 
@@ -304,15 +320,15 @@ class Heap(object):
 # 	print(orden)
 # 	return True
 
-g = Grafo()
-g["Hola"] = {}
-g["Chau"] = {}
-g["Adios"] = {}
-g["Ciao"] = {}
-g["JEJE"] = {}
-g.agregar_arista("Hola", "Chau")
-g.agregar_arista("Hola", "Adios")
-g.agregar_arista("Adios", "Chau")
-g.agregar_arista("Adios", "Ciao")
-g.agregar_arista("Ciao", "JEJE")
-g.agregar_arista("JEJE", "Chau")
+# g = Grafo()
+# g["Hola"] = {}
+# g["Chau"] = {}
+# g["Adios"] = {}
+# g["Ciao"] = {}
+# g["JEJE"] = {}
+# g.agregar_arista("Hola", "Chau")
+# g.agregar_arista("Hola", "Adios")
+# g.agregar_arista("Adios", "Chau")
+# g.agregar_arista("Adios", "Ciao")
+# g.agregar_arista("Ciao", "JEJE")
+# g.agregar_arista("JEJE", "Chau")

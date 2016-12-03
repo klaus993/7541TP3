@@ -26,8 +26,8 @@ def main():
 			if not validar_comando(comando):
 				print(USO)
 				continue
-			if comando.split(" ")[0] == "camino":
-				param = comando[len("camino") + 1:].split(", ")
+			if comando.split(" ")[0] == "camino" and len(comando[len("camino") + 1:].split(" ")) == 2:
+				param = comando[len("camino") + 1:].split(" ")
 				camino(grafo, param[0], param[1])
 			elif comando == "salir":
 				return
