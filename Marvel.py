@@ -1,4 +1,4 @@
-#!/Library/Frameworks/Python.framework/Versions/3.5/bin/python3
+#!/usr/bin/python3
 
 from time import sleep
 from parse import parse
@@ -26,8 +26,8 @@ def main():
 			if not validar_comando(comando):
 				print(USO)
 				continue
-			if comando.split(" ")[0] == "camino" and len(comando[len("camino") + 1:].split(" ")) == 2:
-				param = comando[len("camino") + 1:].split(" ")
+			param = comando[len("camino") + 1:].split(", ")
+			if comando.split(" ")[0] == "camino" and len(param) == 2:
 				camino(grafo, param[0], param[1])
 			elif comando == "salir":
 				return
