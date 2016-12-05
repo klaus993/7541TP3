@@ -264,8 +264,6 @@ class Grafo(object):
 				lista = []
 				for p in self[actual]:
 					lista.extend(repeat(p, self[actual][p]))
-				print(i, largo)
-				print(len(lista))
 				actual = random.choice(lista)
 			else:
 				actual = random.choice(self.adyacentes(actual))
