@@ -244,7 +244,7 @@ class Grafo(object):
 		Devuelve: un nuevo grafo, con los mismos vertices que el original, pero en forma de MST.'''
 		raise NotImplementedError()
 
-	def random_walk(self, largo, origen=None, pesado=False):
+	def random_walk(self, largo, origen=None, pesado=True):
 		''' Devuelve una lista con un recorrido aleatorio de grafo.
 			Parametros:
 				- largo: El largo del recorrido a realizar
