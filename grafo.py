@@ -258,7 +258,7 @@ class Grafo(object):
 		if origen is None:
 			origen = random.choice(list(self.vertices.keys()))
 		actual = origen
-		walk.append(actual)
+		#walk.append(actual)
 		while i < largo:
 			if pesado:
 				lista = []
@@ -319,22 +319,3 @@ class Heap(object):
 
 	def heapify(self):
 		heapify(self.lista)
-
-# def visita(v, padre, orden, extra):
-# 	print(v)
-# 	print(padre[v])
-# 	print(orden)
-# 	return True
-
-# g = Grafo()
-# g["Hola"] = {}
-# g["Chau"] = {}
-# g["Adios"] = {}
-# g["Ciao"] = {}
-# g["JEJE"] = {}
-# g.agregar_arista("Hola", "Chau")
-# g.agregar_arista("Hola", "Adios")
-# g.agregar_arista("Adios", "Chau")
-# g.agregar_arista("Adios", "Ciao")
-# g.agregar_arista("Ciao", "JEJE")
-# g.agregar_arista("JEJE", "Chau")

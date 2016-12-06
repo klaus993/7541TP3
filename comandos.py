@@ -1,4 +1,13 @@
+from parse import *
+
 lista_comandos = ["", "salir", "similares", "recomendar", "camino", "centralidad", "distancias", "estadisticas", "comunidades"]
+
+
+def validar_comando(comando):
+	com = comando.split(" ")
+	if com[0] != "estadisticas" and com[0] != "comunidades" and com[0] != "salir" and com[0] != "" and len(com) == 1:
+		return False
+	return com[0] in lista_comandos
 
 
 def camino(grafo, p1, p2):
@@ -22,8 +31,17 @@ def _camino(caminos, p1, p2, camino):
 	return _camino(caminos, p1, caminos[p2].padre, camino)
 
 
-def validar_comando(comando):
-	com = comando.split(" ")
-	if com[0] != "estadisticas" and com[0] != "comunidades" and com[0] != "salir" and com[0] != "" and len(com) == 1:
-		return False
-	return com[0] in lista_comandos
+def recomendar(grafo, personaje):
+	personajes = list()
+	dic = dict()
+	for i in range(1000):
+		lista = grafo.random_walk(1000, personaje)
+		for j in lista:
+			if personaje not in grafo.adyacentes(j) and j != personaje:
+				break
+				personajes.append(j)
+	for p in lista:
+		dic[p] = 0
+	for p in lista:
+		dic[p] += 1
+	return dic
