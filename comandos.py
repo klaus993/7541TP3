@@ -1,4 +1,6 @@
 from parse import *
+from collections import Counter
+
 
 lista_comandos = ["", "salir", "similares", "recomendar", "camino", "centralidad", "distancias", "estadisticas", "comunidades"]
 
@@ -34,14 +36,9 @@ def _camino(caminos, p1, p2, camino):
 def recomendar(grafo, personaje):
 	personajes = list()
 	dic = dict()
-	for i in range(1000):
-		lista = grafo.random_walk(1000, personaje)
+	for i in range(50):
+		lista = grafo.random_walk(50, personaje)
 		for j in lista:
 			if personaje not in grafo.adyacentes(j) and j != personaje:
-				break
 				personajes.append(j)
-	for p in lista:
-		dic[p] = 0
-	for p in lista:
-		dic[p] += 1
-	return dic
+	return (Counter(personajes))
