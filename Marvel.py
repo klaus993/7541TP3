@@ -36,8 +36,9 @@ def main():
 			elif com == "similares" and len(comando[len("recomendar") + 1:].split(", ")) == 2 and comando[len("recomendar") + 1:].split(", ")[1].isdigit():
 				param = param = comando[len("similares") + 1:].split(", ")
 				similares(grafo, param[0], int(param[1]), 500, 50, adyacentes=True)
-			elif com == "centralidad":
-				pass
+			elif com == "centralidad" and len(comando[len("centralidad") + 1:].split(", ")) == 1:
+				param = param = comando[len("centralidad") + 1:].split(", ")
+				similares(grafo, None, int(param[0]), 500, 500, adyacentes=True)
 			elif com == "distancias":
 				pass
 			elif com == "estadisticas":

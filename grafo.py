@@ -270,7 +270,7 @@ class Grafo(object):
 		return walk
 
 	def similares(self, personaje, walk_len, walk_q, adyacentes=False):
-		if personaje not in self.vertices:
+		if personaje is not None and personaje not in self.vertices:
 			raise KeyError("El personaje {} no se encuentra en el grafo".format(personaje))
 		personajes = list()
 		for i in range(walk_q):
