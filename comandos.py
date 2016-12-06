@@ -31,9 +31,13 @@ def _camino(caminos, p1, p2, camino):
 	camino.append(caminos[p2].padre)
 	return _camino(caminos, p1, caminos[p2].padre, camino)
 
-def recomendar(grafo, personaje, cantidad):
+def similares(grafo, personaje, cantidad, cant_caminos, profundidad, adyacentes):
+	''' Recibe el grafo, un personaje, la cantidad de personajes similares a devolver, la cantidad de caminos
+	y la profundidad del random walk, y un booleano, si es True se consideran los adyacentes, si es False no.
+	Esto último es así para que la función sea reutilizable para los comandos recomendar y similares. 
+	'''
 	try:
-		counter = grafo.recomendar(personaje, 500, 20)
+		counter = grafo.similares(personaje, cant_caminos, profundidad, adyacentes)
 	except KeyError as e:
 		print(e)
 		return
@@ -43,4 +47,4 @@ def recomendar(grafo, personaje, cantidad):
 	if len(recomendados) > 0:
 		print(recomendados[len(recomendados) - 1])
 	else:
-		print("El personaje no tiene suficientes conexiones para recomendar")
+		print("El personaje no tiene suficientes conexiones")

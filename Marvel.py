@@ -32,14 +32,17 @@ def main():
 				camino(grafo, param[0], param[1])
 			elif com == "recomendar" and len(comando[len("recomendar") + 1:].split(", ")) == 2:
 				param = comando[len("recomendar") + 1:].split(", ")
-				recomendar(grafo, param[0], int(param[1]))
-			elif com == centralidad:
+				similares(grafo, param[0], int(param[1]), 500, 30, adyacentes=False)
+			elif com == "similares":
+				param = param = comando[len("similares") + 1:].split(", ")
+				similares(grafo, param[0], int(param[1]), 500, 50, adyacentes=True)
+			elif com == "centralidad":
 				pass
-			elif com == distancias:
+			elif com == "distancias":
 				pass
-			elif com == estadisticas:
+			elif com == "estadisticas":
 				pass
-			elif com == comunidades:
+			elif com == "comunidades":
 				pass
 			elif comando == "salir":
 				return

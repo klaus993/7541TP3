@@ -269,15 +269,19 @@ class Grafo(object):
 			i += 1
 		return walk
 
-	def recomendar(self, personaje, walk_len, walk_q):
+	def similares(self, personaje, walk_len, walk_q, adyacentes=False):
 		if personaje not in self.vertices:
 			raise KeyError("El personaje {} no se encuentra en el grafo".format(personaje))
 		personajes = list()
 		for i in range(walk_q):
 			lista = self.random_walk(walk_len, personaje)
 			for j in lista:
-				if personaje not in self.adyacentes(j) and j != personaje:
-					personajes.append(j)
+				if not adyacentes:
+					if personaje not in self.adyacentes(j) and j != personaje:
+						personajes.append(j)
+				else:
+					if j != personaje:
+						personajes.append(j)
 		return Counter(personajes)
 
 
