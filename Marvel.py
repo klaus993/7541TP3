@@ -30,10 +30,10 @@ def main():
 			param = comando[len("camino") + 1:].split(", ")
 			if com == "camino" and len(param) == 2:
 				camino(grafo, param[0], param[1])
-			elif com == "recomendar" and len(comando[len("recomendar") + 1:].split(", ")) == 2:
+			elif com == "recomendar" and len(comando[len("recomendar") + 1:].split(", ")) == 2 and comando[len("recomendar") + 1:].split(", ")[1].isdigit():
 				param = comando[len("recomendar") + 1:].split(", ")
 				similares(grafo, param[0], int(param[1]), 500, 30, adyacentes=False)
-			elif com == "similares":
+			elif com == "similares" and len(comando[len("recomendar") + 1:].split(", ")) == 2 and comando[len("recomendar") + 1:].split(", ")[1].isdigit():
 				param = param = comando[len("similares") + 1:].split(", ")
 				similares(grafo, param[0], int(param[1]), 500, 50, adyacentes=True)
 			elif com == "centralidad":
@@ -43,6 +43,8 @@ def main():
 			elif com == "estadisticas":
 				pass
 			elif com == "comunidades":
+				pass
+			elif com == "":
 				pass
 			elif comando == "salir":
 				return
