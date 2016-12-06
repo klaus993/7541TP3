@@ -1,6 +1,7 @@
 from queue import *
 from heapq import *
 from itertools import repeat
+from collections import Counter
 import random
 import pdb
 
@@ -258,18 +259,38 @@ class Grafo(object):
 		if origen is None:
 			origen = random.choice(list(self.vertices.keys()))
 		actual = origen
-		#walk.append(actual)
 		while i < largo:
 			if pesado:
 				lista = []
-				for p in self[actual]:
-					lista.extend(repeat(p, self[actual][p]))
-				actual = random.choice(lista)
+				actual = vertice_aleatorio(self[actual])
 			else:
 				actual = random.choice(self.adyacentes(actual))
 			walk.append(actual)
 			i += 1
 		return walk
+
+	def recomendar(self, personaje, walk_len, walk_q):
+		if personaje not in self.vertices:
+			raise KeyError("El personaje {} no se encuentra en el grafo".format(personaje))
+		personajes = list()
+		for i in range(walk_q):
+			lista = self.random_walk(walk_len, personaje)
+			for j in lista:
+				if personaje not in self.adyacentes(j) and j != personaje:
+					personajes.append(j)
+		return Counter(personajes)
+
+
+def vertice_aleatorio(pesos):
+    '''Pesos es un diccionario de pesos, clave vertice vecino, valor el peso.
+    '''
+    total = sum(pesos.values())
+    rand = random.uniform(0, total)
+    acum = 0
+    for vertice, peso_arista in pesos.items():
+        if acum + peso_arista >= rand:
+            return vertice
+        acum += peso_arista
 
 
 class Item(object):

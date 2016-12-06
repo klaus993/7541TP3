@@ -1,5 +1,4 @@
 from parse import *
-from collections import Counter
 
 
 lista_comandos = ["", "salir", "similares", "recomendar", "camino", "centralidad", "distancias", "estadisticas", "comunidades"]
@@ -32,13 +31,16 @@ def _camino(caminos, p1, p2, camino):
 	camino.append(caminos[p2].padre)
 	return _camino(caminos, p1, caminos[p2].padre, camino)
 
-
-def recomendar(grafo, personaje):
-	personajes = list()
-	dic = dict()
-	for i in range(50):
-		lista = grafo.random_walk(50, personaje)
-		for j in lista:
-			if personaje not in grafo.adyacentes(j) and j != personaje:
-				personajes.append(j)
-	return (Counter(personajes))
+def recomendar(grafo, personaje, cantidad):
+	try:
+		counter = grafo.recomendar(personaje, 500, 20)
+	except KeyError as e:
+		print(e)
+		return
+	recomendados = sorted(counter, key=counter.get, reverse=True)[:cantidad] # Arma una lista con los "cantidad" personajes que más aparecen
+	for i in range(len(recomendados) - 1):
+		print(recomendados[i],end=', ')
+	if len(recomendados) > 0:
+		print(recomendados[len(recomendados) - 1])
+	else:
+		print("El personaje no tiene suficientes conexiones para recomendar")
