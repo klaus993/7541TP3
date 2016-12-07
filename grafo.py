@@ -184,7 +184,6 @@ class Grafo(object):
 					q.put(u)
 					if visitar(u, padre, orden, extra) == False:
 						return
-		print(cont)
 
 	def dfs(self, visitar, extra, origen, visitados, padre, orden):
 		visitados[origen] = True

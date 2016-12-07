@@ -1,19 +1,16 @@
 from parse import *
-from Marvel import *
 from grafo import *
 
 grafo = parse("marvel.pjk")
 
-def contador(dic, indice):
-	dic[indice] = "caca"
 
 def generar_distancias(v, padre, orden, distancias):
 	if not padre:
 		distancias[1][0] = 0 #diccionario distancia: contador
 		return
 	elif padre != distancias[0][0]:
-		if distancias[0][0] not in distancias[1]:
-			distancias[1][distancias[0][0]] = 0
+		if distancias[0][1] not in distancias[1]:
+			distancias[1][distancias[0][1]] = 0
 			distancias[0][1] += 1
 		distancias[0][0] = padre
 	distancias[1][distancias[0][1] - 1] += 1
@@ -28,6 +25,4 @@ def distancias(grafo, personaje):
 	for clave,valor in distancias[1].items():
 		print("Distancia "+ str(clave)+": "+str(valor))
 
-distancias(grafo, "HULK")
-
-main()
+distancias(grafo, "BLACK PANTHER")
