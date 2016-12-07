@@ -43,8 +43,10 @@ def main():
 			elif com == "centralidad" and len(comando[len("centralidad") + 1:].split(", ")) == 1:
 				param = param = comando[len("centralidad") + 1:].split(", ")
 				centralidad(grafo, int(param[0]))
-			elif com == "distancias":
-				pass
+			elif com == "distancias" and len(comando[len("distancias") + 1:].split(", ")) == 1:
+				param = param = comando[len("centralidad") + 1:].split(", ")
+				distancias(grafo, param[0])
+				
 			elif com == "estadisticas":
 				pass
 			elif com == "comunidades":

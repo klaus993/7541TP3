@@ -184,6 +184,7 @@ class Grafo(object):
 					q.put(u)
 					if visitar(u, padre, orden, extra) == False:
 						return
+		print(cont)
 
 	def dfs(self, visitar, extra, origen, visitados, padre, orden):
 		visitados[origen] = True
@@ -270,7 +271,7 @@ class Grafo(object):
 		return walk
 
 	def random_walks(self, personaje, walk_len, walk_q, adyacentes=False):
-		''' Realiza "walk_q" random walks de "walk_len" lontigud, partiendo desde el personaje "personaje".
+		''' Realiza "walk_q" random walks de "walk_len" longitud, partiendo desde el personaje "personaje".
 		Si el personaje es None, empieza en un personaje aleatorio.
 		El parámetro "adyacentes" es un booleano que indica si incluir o no a los adyacentes en el objeto
 		devuelto.

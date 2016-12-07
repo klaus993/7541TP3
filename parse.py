@@ -3,7 +3,7 @@ from grafo import *
 def parse(file):
 	''' Parsea un archivo .pjk (que posee labels y pesos) a una estructura Grafo.
 	Primero se agregan los vértices, siendo:
-	- line[0] el número de arista,
+	- line[0] el número de vértices,
 	- line[1] el label.
 	Luego se agregan las aristas, siendo:
 	- line[0] el vértice origen,
@@ -19,7 +19,7 @@ def parse(file):
 			line = line.split('"')
 			grafo[line[1]] = {}
 			vert_dict[int(line[0])] = line[1]
-			if int(line[0]) == vertices:			# Corta cuando llega al número de aristas predefinido
+			if int(line[0]) == vertices:			# Corta cuando llega al número de vertices predefinido
 				break
 		f.readline()
 		for line in f:								# Agrega las aristas

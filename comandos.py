@@ -58,8 +58,22 @@ def centralidad(grafo, cantidad):
 	random_walks(grafo, None, cantidad, 500, 250, adyacentes=True)
 
 
-def distancias(personaje):
-	pass
+def generar_distancias(v, padre, orden, distancias):
+	if padre != distancias[0]:
+		distancias[1][distancias[0][1]] = 0
+		distancias[0][1] += 1
+		distancias[0] = padre
+	distancias[1][distancias[0][1]] += 1
+
+def distancias(grafo, personaje):
+	''' Recibe un grafo y el identificador de un vértice. Imprime por pantalla
+	la cantidad de personajes que se encuentran a cada una de las distancias
+	posibles. '''
+	dic_distancias = {}
+	distancias = [[None, 1], dic_distancias] 
+	grafo.recorrer("bfs", generar_distancias, distancias, personaje)
+	for clave,valor in distancias[1].items():
+		print("Distancia "+ str(clave)+": "+str(valor))
 
 
 def estadisticas():
@@ -74,7 +88,7 @@ def random_walks(grafo, personaje, cantidad, cant_caminos, profundidad, adyacent
 	''' Recibe el grafo, un personaje, la cantidad de personajes a devolver, la cantidad de caminos,
 	la profundidad del random walk, y un booleano. Si es True se consideran los adyacentes, si es False no.
 	Esto último es así para que la función sea reutilizable. 
-	Imprime los "cantidad" personajes por pantalla. Si no hay personajes, imprime un menasje de error.
+	Imprime los "cantidad" personajes por pantalla. Si no hay personajes, imprime un mensaje de error.
 	'''
 	try:
 		counter = grafo.random_walks(personaje, cant_caminos, profundidad, adyacentes)
