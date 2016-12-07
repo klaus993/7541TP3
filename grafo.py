@@ -269,7 +269,14 @@ class Grafo(object):
 			i += 1
 		return walk
 
-	def similares(self, personaje, walk_len, walk_q, adyacentes=False):
+	def random_walks(self, personaje, walk_len, walk_q, adyacentes=False):
+		''' Realiza "walk_q" random walks de "walk_len" lontigud, partiendo desde el personaje "personaje".
+		Si el personaje es None, empieza en un personaje aleatorio.
+		El parámetro "adyacentes" es un booleano que indica si incluir o no a los adyacentes en el objeto
+		devuelto.
+		Devuelve un objeto Counter (objeto casi identico a un diccionario) con los personajes como claves y
+		su cantidad de apariciones como valor.
+		'''
 		if personaje is not None and personaje not in self.vertices:
 			raise KeyError("El personaje {} no se encuentra en el grafo".format(personaje))
 		personajes = list()
@@ -282,11 +289,13 @@ class Grafo(object):
 				else:
 					if j != personaje:
 						personajes.append(j)
-		return Counter(personajes)
+		return Counter(personajes)  # Recibe la lista "personajes" y la vuelca en un objeto Counter (diccionario) con
+									# los personajes como claves y su cantidad de apariciones como valor.
 
 
 def vertice_aleatorio(pesos):
     '''Pesos es un diccionario de pesos, clave vertice vecino, valor el peso.
+    Devuelve un vértice aleatorio, pero tomando en cuenta los pesos como probabilidades.
     '''
     total = sum(pesos.values())
     rand = random.uniform(0, total)

@@ -17,6 +17,10 @@ USO = "Uso:\n\
 
 
 def main():
+	'''Main. Hay que arreglar los if, elif, etc ya que las validaciones de cada comando son un choclo.
+	Habría que ponerlas en funciones aparte, pero lo voy a hacer al final porque no es algo crucial, son detalles.
+	El try except es por si el usuario toca Control+C o Control+D, para que no termine el programa.
+	'''
 	print("¡Bienvenido al mundo de Marvel!")
 	print(USO)
 	grafo = parse("marvel.pjk")
@@ -32,13 +36,13 @@ def main():
 				camino(grafo, param[0], param[1])
 			elif com == "recomendar" and len(comando[len("recomendar") + 1:].split(", ")) == 2 and comando[len("recomendar") + 1:].split(", ")[1].isdigit():
 				param = comando[len("recomendar") + 1:].split(", ")
-				similares(grafo, param[0], int(param[1]), 500, 30, adyacentes=False)
-			elif com == "similares" and len(comando[len("recomendar") + 1:].split(", ")) == 2 and comando[len("recomendar") + 1:].split(", ")[1].isdigit():
+				recomendar(grafo, param[0], int(param[1]))
+			elif com == "similares" and len(comando[len("similares") + 1:].split(", ")) == 2 and comando[len("similares") + 1:].split(", ")[1].isdigit():
 				param = param = comando[len("similares") + 1:].split(", ")
-				similares(grafo, param[0], int(param[1]), 500, 50, adyacentes=True)
+				similares(grafo, param[0], int(param[1]))
 			elif com == "centralidad" and len(comando[len("centralidad") + 1:].split(", ")) == 1:
 				param = param = comando[len("centralidad") + 1:].split(", ")
-				similares(grafo, None, int(param[0]), 500, 500, adyacentes=True)
+				centralidad(grafo, int(param[0]))
 			elif com == "distancias":
 				pass
 			elif com == "estadisticas":
@@ -54,6 +58,7 @@ def main():
 		except (KeyboardInterrupt, EOFError):
 			print()
 			continue
+
 
 if __name__ == "__main__":
 	main()
