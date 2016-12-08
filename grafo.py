@@ -1,4 +1,4 @@
-from queue import *
+from collections import deque
 from heapq import *
 from itertools import repeat
 from collections import Counter
@@ -171,19 +171,20 @@ class Grafo(object):
 		return padre, orden
 
 	def bfs(self, visitar, extra, origen, visitados, padre, orden):
-		q = Queue()
-		q.put(origen)
+		d = deque()
+		d.append(origen)
 		visitados[origen] = True
-		while not q.empty():
-			v = q.get()
+		while len(d) > 0:
+			v = d.popleft()
 			for u in self.adyacentes(v):
 				if u not in visitados:
 					visitados[u] = True
 					padre[u] = v
 					orden[u] = orden[v] + 1
-					q.put(u)
-					if visitar(u, padre, orden, extra) == False:
-						return
+					d.append(u)
+					if visitar:
+						if visitar(u, padre, orden, extra) == False:
+							return
 
 	def dfs(self, visitar, extra, origen, visitados, padre, orden):
 		visitados[origen] = True
