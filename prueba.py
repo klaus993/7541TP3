@@ -76,6 +76,114 @@ def estadisticas(grafo):
 	desvio_estandar = calcular_desvio_estandar(grafo, promedio_grados_vertices, cant_vertices)
 	densidad = calcular_densidad(grafo, cant_vertices, cant_aristas)
 	print("Cantidad de vértices: {}\nCantidad de aristas: {}\nPromedio del grado de cada vértice: {}\nDesvío estándar del grado de cada vértice: {}\nDensidad del grafo: {}".format(cant_vertices, cant_aristas, promedio_grados_vertices, desvio_estandar, densidad))
-		
 
-estadisticas(grafo)
+def label_propagation(grafo, label, corte):
+	'''Recibe un grafo, un diccionario llamado label y un valor corte. Esta
+	función realiza el algoritmo label propagation sobre label hasta que este se
+	termina (en caso de que corte sea cero) o hasta que se llegue al número de 
+	iteración indicado por corte. '''
+	frecuencia = {}
+	i = 0
+	max_freq = 0
+	vertice_max_freq = None
+	iguales = True
+	vertice_min_freq = None
+	aux = {}
+	for clave, valor in label.items():
+		for adyacente in grafo.adyacentes(clave):
+			if not adyacente in frecuencia:
+				frecuencia[adyacente] = 0
+			frecuencia[adyacente] += 1
+		for clave2, valor2 in frecuencia.items():
+			if valor2 not in frecuencia:
+				aux[valor2] = clave2
+		referente = valor2
+		for frec in aux:
+			if frec != referente:
+				iguales = False
+		if iguales:
+			min_freq = frec
+			for clave2, valor2 in aux.items():
+				if clave2 < min_freq:
+					min_freq = clave2
+					vertice_min_freq = valor2
+			if vertice_min_freq:
+				label[clave] = label[vertice_min_freq]
+				vertice_min_freq = None
+		else:
+			for clave2, valor2 in aux.items():
+				if clave2 > max_freq:
+					max_freq = clave2
+					vertice_max_freq = valor2
+			if vertice_max_freq:
+				label[clave] = label[vertice_max_freq]
+				vertice_max_freq = None
+				frecuencia = {}
+				max_freq = 0
+		iguales = True
+		if corte:
+			if i == corte:
+				break
+		i += 1
+
+def comunidades(grafo, corte = 0):
+	'''Recibe un grafo y un valor corte que determina si el algoritmo se hace 
+	hasta un determinado corte o no y cuántas veces itera. Muestra por pantalla 
+	las comunidades que se encuentran en el grafo. '''
+	label = {}
+	i = 0
+	for vertice in grafo.keys():
+		label[vertice] = i
+		i += 1
+	label_propagation(grafo, label, corte)
+	dic_comunidades = {}
+	for clave, valor in label.items():
+		if valor not in dic_comunidades:
+			dic_comunidades[valor] = []
+		dic_comunidades[valor].append(clave)
+	numero_comunidad = 1
+	for clave, valor in dic_comunidades.items():
+		print("clave:"+ str(clave))
+		print("valor: ")
+		for integrante in valor:
+			print(integrante + " ")
+		print("]")
+	cont = 0
+	for clave, valor in dic_comunidades.items():
+		cont += 1
+		print("Comunidad " + str(numero_comunidad) + ":")
+		for integrante in valor:
+			print(integrante + " ")
+		print("----------")
+		numero_comunidad += 1 
+	print(cont)
+		
+def grafeo():
+	grafo = Grafo()
+	cantidad = grafo.__contains__("jorge")
+	grafo.__setitem__("Fede",5)
+	grafo.__setitem__("Martin",5)
+	grafo.__setitem__("Gaston",4)
+	grafo.__setitem__("Ezequiel",4)
+	grafo.__setitem__("Agus",3)
+	grafo.__setitem__("Mike",3)
+	grafo.__setitem__("Nacho",3)
+	grafo.__setitem__("Gonza",3)
+	grafo.__setitem__("Cano",3)
+	grafo.__setitem__("Joaquin",3)
+	grafo.__setitem__("Juan",3)
+	grafo.agregar_arista("Fede", "Martin")
+	grafo.agregar_arista("Fede", "Gaston")
+	grafo.agregar_arista("Fede", "Ezequiel")
+	grafo.agregar_arista("Martin", "Agus")
+	grafo.agregar_arista("Martin", "Mike")
+	grafo.agregar_arista("Gaston", "Nacho")
+	grafo.agregar_arista("Gaston", "Gonza")
+	grafo.agregar_arista("Ezequiel", "Cano")
+	grafo.agregar_arista("Cano", "Joaquin")
+	grafo.agregar_arista("Martin", "Gaston")
+	grafo.agregar_arista("Martin", "Ezequiel")
+	grafo.agregar_arista("Joaquin", "Juan")
+	comunidades(grafo)
+
+comunidades(grafo)
