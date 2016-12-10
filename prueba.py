@@ -87,29 +87,29 @@ def label_propagation(grafo, label, corte):
 	max_freq = 0
 	vertice_max_freq = None
 	iguales = True
-	vertice_min_freq = None
 	aux = {}
+	vertice_min_label = None
+	min_label = 6450 #para tomar como valor maximo, dsp podemos poner la cant de vertices + 1
 	for clave, valor in label.items():
 		for adyacente in grafo.adyacentes(clave):
 			if not adyacente in frecuencia:
 				frecuencia[adyacente] = 0
 			frecuencia[adyacente] += 1
 		for clave2, valor2 in frecuencia.items():
-			if valor2 not in frecuencia:
+			if valor2 not in aux:
 				aux[valor2] = clave2
 		referente = valor2
 		for frec in aux:
 			if frec != referente:
 				iguales = False
 		if iguales:
-			min_freq = frec
-			for clave2, valor2 in aux.items():
-				if clave2 < min_freq:
-					min_freq = clave2
-					vertice_min_freq = valor2
-			if vertice_min_freq:
-				label[clave] = label[vertice_min_freq]
-				vertice_min_freq = None
+			for adyacente in grafo.adyacentes(clave):
+				if label[adyacente] < min_label:
+					min_label = label[adyacente]
+					vertice_min_label = adyacente
+			if vertice_min_label:
+				label[clave] = label[vertice_min_label]
+				vertice_min_label = None
 		else:
 			for clave2, valor2 in aux.items():
 				if clave2 > max_freq:
@@ -130,33 +130,29 @@ def comunidades(grafo, corte = 0):
 	'''Recibe un grafo y un valor corte que determina si el algoritmo se hace 
 	hasta un determinado corte o no y cuántas veces itera. Muestra por pantalla 
 	las comunidades que se encuentran en el grafo. '''
-	label = {}
+	label_original = {}
+	label_aux = {}
 	i = 0
 	for vertice in grafo.keys():
-		label[vertice] = i
+		label_original[vertice] = i
 		i += 1
-	label_propagation(grafo, label, corte)
+	label_aux = label_original
+	while(True) :
+		label_propagation(grafo, label_aux, corte)
+		if(label_aux == label_original): break
+		label_original = label_aux
 	dic_comunidades = {}
-	for clave, valor in label.items():
+	for clave, valor in label_original.items():
 		if valor not in dic_comunidades:
 			dic_comunidades[valor] = []
 		dic_comunidades[valor].append(clave)
 	numero_comunidad = 1
 	for clave, valor in dic_comunidades.items():
-		print("clave:"+ str(clave))
-		print("valor: ")
-		for integrante in valor:
-			print(integrante + " ")
-		print("]")
-	cont = 0
-	for clave, valor in dic_comunidades.items():
-		cont += 1
 		print("Comunidad " + str(numero_comunidad) + ":")
 		for integrante in valor:
 			print(integrante + " ")
 		print("----------")
 		numero_comunidad += 1 
-	print(cont)
 		
 def grafeo():
 	grafo = Grafo()
