@@ -4,6 +4,7 @@ from time import sleep
 from parse import parse
 from grafo import Grafo
 from comandos import *
+import sys
 
 USO = "Uso:\n\
 	> similares <personaje>, [cantidad]\n\
@@ -21,9 +22,20 @@ def main():
 	Habría que ponerlas en funciones aparte, pero lo voy a hacer al final porque no es algo crucial, son detalles.
 	El try except es por si el usuario toca Control+C o Control+D, para que no termine el programa.
 	'''
+	try:
+		if sys.argv[1][-3:] != "pjk":
+			print("El archivo indicado debe ser formato pajek (.pjk)")
+			return
+	except IndexError:
+		print("Uso: {} <archivo>".format(sys.argv[0]))
+		return
+	try:
+		grafo = parse(sys.argv[1])
+	except FileNotFoundError:
+		print("El archivo {} no existe.".format(sys.argv[1]))
+		return
 	print("¡Bienvenido al mundo de Marvel!")
 	print(USO)
-	grafo = parse("marvel.pjk")
 	while True:
 		try:
 			comando = input("> ")
