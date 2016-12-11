@@ -1,5 +1,6 @@
 from grafo import *
 
+
 def parse(file):
 	''' Parsea un archivo .pjk (que posee labels y pesos) a una estructura Grafo.
 	Primero se agregan los vértices, siendo:

@@ -55,6 +55,7 @@ class Grafo(object):
 
 	def __setitem__(self, id, valor):
 		'''Agrega un nuevo vertice con el par <id, valor> indicado. ID debe ser de identificador unico del vertice.
+		"valor" es la lista de adyacencias del "id" representada con un diccionario.
 		En caso que el identificador ya se encuentre asociado a un vertice, se actualizara el valor.
 		'''
 		self.vertices[id] = {}

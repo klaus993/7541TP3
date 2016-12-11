@@ -14,7 +14,7 @@ USO = "Uso:\n\
 	> distancias <personaje>\n\
 	> estadisticas\n\
 	> comunidades\n\
-	> salir"
+	> salir o Ctrl-D para salir"
 
 
 def main():
@@ -42,36 +42,33 @@ def main():
 			if not validar_comando(comando):
 				print(USO)
 				continue
-			com = comando.split(" ")[0]
-			param = comando[len("camino") + 1:].split(", ")
-			if com == "camino" and len(param) == 2:
-				camino(grafo, param[0], param[1])
-			elif com == "recomendar" and len(comando[len("recomendar") + 1:].split(", ")) == 2 and comando[len("recomendar") + 1:].split(", ")[1].isdigit():
-				param = comando[len("recomendar") + 1:].split(", ")
-				recomendar(grafo, param[0], int(param[1]))
-			elif com == "similares" and len(comando[len("similares") + 1:].split(", ")) == 2 and comando[len("similares") + 1:].split(", ")[1].isdigit():
-				param = param = comando[len("similares") + 1:].split(", ")
-				similares(grafo, param[0], int(param[1]))
-			elif com == "centralidad" and len(comando[len("centralidad") + 1:].split(", ")) == 1:
-				param = param = comando[len("centralidad") + 1:].split(", ")
-				centralidad(grafo, int(param[0]))
-			elif com == "distancias" and len(comando[len("distancias") + 1:].split(", ")) == 1:
-				param = param = comando[len("centralidad") + 1:].split(", ")
-				distancias(grafo, param[0])
-				
-			elif com == "estadisticas":
+			com_tup = validar_comandos(comando)
+			if com_tup[0] == "camino":
+				camino(grafo, com_tup[1], com_tup[2])
+			elif com_tup[0] == "recomendar":
+				recomendar(grafo, com_tup[1], com_tup[2])
+			elif com_tup[0] == "similares":
+				similares(grafo, com_tup[1], com_tup[2])
+			elif com_tup[0] == "centralidad":
+				centralidad(grafo, com_tup[1])
+			elif com_tup[0] == "distancias":
+				distancias(grafo, com_tup[1])
+			elif com_tup[0] == "estadisticas":
+				estadisticas(grafo)
+			elif com_tup[0] == "comunidades":
 				pass
-			elif com == "comunidades":
+			elif com_tup[0] == "":
 				pass
-			elif com == "":
-				pass
-			elif comando == "salir":
-				return
+			elif com_tup[0] == "salir":
+				raise EOFError
 			else:
 				print(USO)
-		except (KeyboardInterrupt, EOFError):
+		except KeyboardInterrupt:
 			print()
 			continue
+		except EOFError:
+			print()
+			return
 
 
 if __name__ == "__main__":

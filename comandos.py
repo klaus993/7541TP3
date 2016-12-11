@@ -1,7 +1,16 @@
 from parse import *
 import math
 
-lista_comandos = ["", "salir", "similares", "recomendar", "camino", "centralidad", "distancias", "estadisticas", "comunidades"]
+# 1 es camino
+# 2 es recomendar
+# 3 es similares
+# 4 es centralidad
+# 5 es distancias
+# 6 es estadisticas
+# 7 es comunidades
+# 8 es salir
+
+lista_comandos = ["", "camino", "recomendar", "similares", "centralidad", "distancias", "estadisticas", "comunidades", "salir"]
 
 
 def validar_comando(comando):
@@ -9,6 +18,34 @@ def validar_comando(comando):
 	if com[0] != "estadisticas" and com[0] != "comunidades" and com[0] != "salir" and com[0] != "" and len(com) == 1:
 		return False
 	return com[0] in lista_comandos
+
+
+def validar_comandos(comando):
+	com = comando.split(" ")[0]
+	param = comando[len("camino") + 1:].split(", ")
+	if com == "camino" and len(param) == 2:
+		return com, param[0], param[1]
+	param = comando[len("recomendar") + 1:].split(", ")
+	if com == "recomendar" and len(param) == 2 and param[1].isdigit():
+		return com, param[0], int(param[1])
+	param = comando[len("similares") + 1:].split(", ")
+	if com == "similares" and len(param) == 2 and param[1].isdigit():
+		return com, param[0], int(param[1])
+	param = comando[len("centralidad") + 1:].split(", ")
+	if com == "centralidad" and len(param) == 1:
+		return com, int(param[0])
+	param = comando[len("distancias") + 1:].split(", ")
+	if com == "distancias" and len(param) == 1:
+		return com, param[0]
+	if com == "estadisticas":
+		return com,
+	if com == "comunidades":
+		return com,
+	if com == "":
+		return com,
+	if com == "salir":
+		return com,
+	return None,
 
 
 def camino(grafo, p1, p2):
@@ -70,19 +107,21 @@ def generar_distancias(v, padre, orden, dic_distancias):
 		dic_distancias[orden[v]] = 0
 	dic_distancias[orden[v]] += 1
 
+
 def distancias(grafo, personaje):
 	''' Recibe un grafo y el identificador de un vértice. Imprime por pantalla
 	la cantidad de personajes que se encuentran a cada una de las distancias
 	posibles. '''
 	dic_distancias = {}
 	grafo.recorrer("bfs", generar_distancias, dic_distancias, personaje)
-	for clave,valor in dic_distancias.items():
-		print("Distancia "+ str(clave)+": "+str(valor))
+	for clave, valor in dic_distancias.items():
+		print("Distancia " + str(clave) + ": " + str(valor))
+
 
 def calcular_vertices(grafo):
 	'''Recibe un grafo y calcula su cantidad de vértices. '''
-	lista_idvertices = grafo.keys()
-	return len(lista_idvertices)
+	return len(grafo.keys())
+
 
 def calcular_aristas_y_promedio_gr_vert(grafo, cant_vertices):
 	'''Recibe un grafo y la cantidad de vertices que posee. Devuelve la cantidad
@@ -97,6 +136,7 @@ def calcular_aristas_y_promedio_gr_vert(grafo, cant_vertices):
 	promedio_grados_vertices = sumatoria_grados / cant_vertices	
 	return cant_aristas, promedio_grados_vertices
 
+
 def calcular_desvio_estandar(grafo, promedio_grados_vertices, cant_vertices):
 	'''Recibe un grafo junto a su cantidad de vértices y a su promedio del grado
 	de los vértices y devuelve el desvío estándar del grado de los vértices. '''
@@ -104,14 +144,14 @@ def calcular_desvio_estandar(grafo, promedio_grados_vertices, cant_vertices):
 	for vertice in grafo.keys():
 		sumatoria_numerador +=  ((len(grafo.adyacentes(vertice)) - promedio_grados_vertices)**2)
 	return math.sqrt(sumatoria_numerador / (cant_vertices - 1)) 
-	
+
+
 def calcular_densidad(grafo, cant_vertices, cant_aristas):
 	'''Recibe un grafo junto a su cantidad de vertices y de aristas y devuelve
 	su densidad. '''
 	cant_max_aristas = cant_vertices * (cant_vertices - 1) / 2
-	densidad = cant_aristas / cant_max_aristas
-	return densidad
-	
+	return cant_aristas / cant_max_aristas
+
 
 def estadisticas(grafo):
 	'''Recibe un grafo e imprime por pantalla la cantidad de vértices y de 
@@ -121,7 +161,8 @@ def estadisticas(grafo):
 	cant_aristas, promedio_grados_vertices = calcular_aristas_y_promedio_gr_vert(grafo, cant_vertices)
 	desvio_estandar = calcular_desvio_estandar(grafo, promedio_grados_vertices, cant_vertices)
 	densidad = calcular_densidad(grafo, cant_vertices, cant_aristas)
-	print("Cantidad de vértices: {}\nCantidad de aristas: {}\nPromedio del grado de cada vértice: {}\nDesvío estándar del grado de cada vértice: {}\nDensidad del grafo: {}".format(cant_vertices, cant_aristas, promedio_grados_vertices, desvio_estandar, densidad))
+	print("Cantidad de vértices: {}\nCantidad de aristas: {}\nPromedio del grado de cada vértice: {:.2f}\nDesvío estándar del grado de cada vértice: {:.2f}\nDensidad del grafo: {:.10f}".format(cant_vertices, cant_aristas, promedio_grados_vertices, desvio_estandar, densidad))
+
 
 def label_propagation(grafo, label, corte):
 	'''Recibe un grafo, un diccionario llamado label y un valor corte. Esta
@@ -172,7 +213,8 @@ def label_propagation(grafo, label, corte):
 				break
 		i += 1
 
-def comunidades(grafo, corte = 0):
+
+def comunidades(grafo, corte=0):
 	'''Recibe un grafo y un valor corte que determina si el algoritmo se hace 
 	hasta un determinado corte o no y cuántas veces itera. Muestra por pantalla 
 	las comunidades que se encuentran en el grafo. '''
@@ -183,9 +225,10 @@ def comunidades(grafo, corte = 0):
 		label_original[vertice] = i
 		i += 1
 	label_aux = label_original
-	while(True) :
+	while True:
 		label_propagation(grafo, label_aux, corte)
-		if(label_aux == label_original): break
+		if(label_aux == label_original):
+			break
 		label_original = label_aux
 	dic_comunidades = {}
 	for clave, valor in label_original.items():
@@ -199,7 +242,7 @@ def comunidades(grafo, corte = 0):
 			print(integrante + " ")
 		print("----------")
 		numero_comunidad += 1 
-	
+
 
 def random_walks(grafo, personaje, cantidad, cant_caminos, profundidad, adyacentes):
 	''' Recibe el grafo, un personaje, la cantidad de personajes a devolver, la cantidad de caminos,
