@@ -123,19 +123,24 @@ def calcular_vertices(grafo):
 	return len(grafo.keys())
 
 
-def calcular_aristas_y_promedio_gr_vert(grafo, cant_vertices):
-	'''Recibe un grafo y la cantidad de vertices que posee. Devuelve la cantidad
-	de aristas que tiene y el promedio del grado de los vértices.'''
+def calcular_aristas(grafo):
+	'''Recibe un grafo. Devuelve la cantidad de aristas que tiene. '''
 	cant_aristas = 0
-	sumatoria_grados = 0
 	for vertice in grafo.keys():
-		sumatoria_grados += len(grafo.adyacentes(vertice))
 		for adyacente in grafo.adyacentes(vertice):
 			cant_aristas += 1
 	cant_aristas //= 2
-	promedio_grados_vertices = sumatoria_grados / cant_vertices	
-	return cant_aristas, promedio_grados_vertices
+	return cant_aristas
 
+
+def calcular_promedio_gr_vertices(grafo, cant_vertices):
+	'''Recibe un grafo y sus cantidad de vértices. Devuelve el promedio de grados
+	de los vertices. '''
+	sumatoria_grados = 0
+	for vertice in grafo.keys():
+		sumatoria_grados += len(grafo.adyacentes(vertice))
+	promedio_grados_vertices = sumatoria_grados / cant_vertices
+	return promedio_grados_vertices
 
 def calcular_desvio_estandar(grafo, promedio_grados_vertices, cant_vertices):
 	'''Recibe un grafo junto a su cantidad de vértices y a su promedio del grado
@@ -158,7 +163,8 @@ def estadisticas(grafo):
 	aristas que posee, el promedio del grado de los vértices, el desvío estándar
 	del grado de los vértices y por último su densidad. '''
 	cant_vertices = calcular_vertices(grafo)
-	cant_aristas, promedio_grados_vertices = calcular_aristas_y_promedio_gr_vert(grafo, cant_vertices)
+	cant_aristas = calcular_aristas(grafo)
+	promedio_grados_vertices = calcular_promedio_gr_vertices(grafo, cant_vertices)
 	desvio_estandar = calcular_desvio_estandar(grafo, promedio_grados_vertices, cant_vertices)
 	densidad = calcular_densidad(grafo, cant_vertices, cant_aristas)
 	print("Cantidad de vértices: {}\nCantidad de aristas: {}\nPromedio del grado de cada vértice: {:.2f}\nDesvío estándar del grado de cada vértice: {:.2f}\nDensidad del grafo: {:.10f}".format(cant_vertices, cant_aristas, promedio_grados_vertices, desvio_estandar, densidad))
