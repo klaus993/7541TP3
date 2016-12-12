@@ -33,10 +33,7 @@ class Grafo(object):
 
 	def __len__(self):
 		'''Devuelve la cantidad de vertices del grafo'''
-		cant_vertices = 0
-		for vertice in self.vertices:
-			cant_vertices += 1
-		return cant_vertices
+		return len(self.vertices)
 
 	def __iter__(self):
 		'''Devuelve un iterador de vertices, sin ningun tipo de relacion entre los consecutivos'''

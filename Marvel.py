@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-from time im  port sleep
 from parse import parse
 from grafo import Grafo
 from comandos import *
@@ -40,7 +39,7 @@ def main():
 		try:
 			comando = input("> ")
 			if not validar_comando(comando):
-				print(USO)
+				print(USO_COM)
 				continue
 			com_tup = validar_comandos(comando)
 			if com_tup[0] == "camino":
@@ -56,11 +55,11 @@ def main():
 			elif com_tup[0] == "estadisticas":
 				estadisticas(grafo)
 			elif com_tup[0] == "comunidades":
-				pass
+				comunidades(grafo)
 			elif com_tup[0] == "":
 				pass
 			elif com_tup[0] == "salir":
-				raise EOFError
+				return
 			else:
 				print(USO_COM)
 		except KeyboardInterrupt:

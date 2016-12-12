@@ -1,4 +1,4 @@
-from grafo import *
+from grafo import Grafo
 
 
 def parse(file):

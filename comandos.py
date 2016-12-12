@@ -1,4 +1,3 @@
-from parse import *
 import math
 
 # [1] es camino
@@ -37,13 +36,13 @@ def validar_comandos(comando):
 	param = comando[len("distancias") + 1:].split(", ")
 	if com == "distancias" and len(param) == 1:
 		return com, param[0]
-	if com == "estadisticas":
+	if comando == "estadisticas":
 		return com,
-	if com == "comunidades":
+	if comando == "comunidades":
 		return com,
 	if com == "":
 		return com,
-	if com == "salir":
+	if comando == "salir":
 		return com,
 	return None,
 
@@ -184,22 +183,11 @@ def estadisticas(grafo):
 	print("Cantidad de vértices: {}\nCantidad de aristas: {}\nPromedio del grado de cada vértice: {:.2f}\nDesvío estándar del grado de cada vértice: {:.2f}\nDensidad del grafo: {:.10f}".format(cant_vertices, cant_aristas, promedio_grados_vertices, desvio_estandar, densidad))
 
 
-def max_freq(d):
-	''' Recibe un diccionario con el formato: {clave=label: valor=frecuencia}.
-	Devuelve el label de mayor frecuencia, o el mínimo label en caso de que todos
-	tengan la misma frecuencia.
-	'''
-	valor = list(d.items())[0][1]
-	if all(val == valor for val in d.values()):
-		return min(d.items(), key=lambda k: k[0])[0]
-	return max(d, key=d.get)
-
-
 def max_freq(l):
-	valor = l[0]
+	valor = min(l)
 	if all(val == valor for val in l):
 		return valor
-	return max(set(lst), key=lst.count)
+	return max(set(l), key=l.count)
 
 
 def crear_label_d(grafo):
@@ -211,39 +199,29 @@ def crear_label_d(grafo):
 	return label_d
 
 
-def crear_freq_d(grafo, label_d):
-	freq_d = {}
-	for v in label_d:
-		freq_d[v] = {}
-		for w in grafo.adyacentes(v):
-			if label_d[w] not in freq_d[v]:
-				freq_d[v][label_d[w]] = 0
-			freq_d[v][label_d[w]] += 1
-	return freq_d
+def propagate_labels(grafo, label_d):
+	for v in grafo:
+		lista_adyacentes = [label_d[w] for w in grafo.adyacentes(v)]
+		if len(lista_adyacentes) != 0:
+			label_d[v] = max_freq(lista_adyacentes)
 
 
-def label_propagation(grafo, corte):
+def label_propagation(grafo, cant):
 	label_d = crear_label_d(grafo)
-	freq_d = crear_freq_d(grafo, label_d)
+	for i in range(cant):
+		propagate_labels(grafo, label_d)
+	return label_d
 
 
-def propagate_labels(grafo, label_d, freq_d):
-	for v in grafo:
-		label_viejo = label_d[v]
-		label_d[v] = max_freq(freq_d[v])
-		for w in grafo.adyacentes(v):
-			if freq_d[w][label_viejo] == 1:
-				del freq_d[x][label_viejo]
-			else:
-				freq_d[x][label_viejo] -= 1
-			if label_d[v] not in freq_d[x]:
-				freq_d[x][label_d[v]] = 0
-			freq_d[x][label_d[v]] += 1
-
-
-def propagate_labels_(grafo, label_d):
-	for v in grafo:
-		lista = []
-		[label_d[w] for w in grafo.adyacentes(v)]
-		if len(lista) != 0:
-			label_d[v] = max_freq(lista)
+def comunidades(grafo):
+	label_d = label_propagation(grafo, 30)
+	d = []
+	for i in range(len(grafo)):
+		d.append([v for v in label_d if label_d[v] == i])
+	j = 1
+	for i in range(len(grafo)):
+		if len(d[i]) > 4 and len(d[i]) < 1000:
+			print("--- COMUNIDAD {} ---".format(j))
+			j += 1
+			for p in d[i]:
+				print(p)
