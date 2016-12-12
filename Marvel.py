@@ -1,12 +1,14 @@
 #!/usr/bin/python3
 
-from time import sleep
+from time im  port sleep
 from parse import parse
 from grafo import Grafo
 from comandos import *
 import sys
 
-USO = "Uso:\n\
+USO_PROG = "Uso: {} <archivo>"
+
+USO_COM = "Uso:\n\
 	> similares <personaje>, [cantidad]\n\
 	> recomendar <personaje>, [cantidad]\n\
 	> camino <personaje_1>, <personaje_2>\n\
@@ -18,16 +20,14 @@ USO = "Uso:\n\
 
 
 def main():
-	'''Main. Hay que arreglar los if, elif, etc ya que las validaciones de cada comando son un choclo.
-	Habría que ponerlas en funciones aparte, pero lo voy a hacer al final porque no es algo crucial, son detalles.
-	El try except es por si el usuario toca Control+C o Control+D, para que no termine el programa.
+	'''
 	'''
 	try:
 		if sys.argv[1][-3:] != "pjk":
 			print("El archivo indicado debe ser formato pajek (.pjk)")
 			return
 	except IndexError:
-		print("Uso: {} <archivo>".format(sys.argv[0]))
+		print(USO_PROG.format(sys.argv[0]))
 		return
 	try:
 		grafo = parse(sys.argv[1])
@@ -35,7 +35,7 @@ def main():
 		print("El archivo {} no existe.".format(sys.argv[1]))
 		return
 	print("¡Bienvenido al mundo de Marvel!")
-	print(USO)
+	print(USO_COM)
 	while True:
 		try:
 			comando = input("> ")
@@ -62,7 +62,7 @@ def main():
 			elif com_tup[0] == "salir":
 				raise EOFError
 			else:
-				print(USO)
+				print(USO_COM)
 		except KeyboardInterrupt:
 			print()
 			continue

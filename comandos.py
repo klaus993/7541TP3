@@ -1,14 +1,14 @@
 from parse import *
 import math
 
-# 1 es camino
-# 2 es recomendar
-# 3 es similares
-# 4 es centralidad
-# 5 es distancias
-# 6 es estadisticas
-# 7 es comunidades
-# 8 es salir
+# [1] es camino
+# [2] es recomendar
+# [3] es similares
+# [4] es centralidad
+# [5] es distancias
+# [6] es estadisticas
+# [7] es comunidades
+# [8] es salir
 
 lista_comandos = ["", "camino", "recomendar", "similares", "centralidad", "distancias", "estadisticas", "comunidades", "salir"]
 
@@ -72,6 +72,26 @@ def _camino(caminos, p1, p2, camino):
 	return _camino(caminos, p1, caminos[p2].padre, camino)
 
 
+def random_walks(grafo, personaje, cantidad, cant_caminos, profundidad, adyacentes):
+	''' Recibe el grafo, un personaje, la cantidad de personajes a devolver, la cantidad de caminos,
+	la profundidad del random walk, y un booleano. Si es True se consideran los adyacentes, si es False no.
+	Esto último es así para que la función sea reutilizable. 
+	Imprime los "cantidad" personajes por pantalla. Si no hay personajes, imprime un mensaje de error.
+	'''
+	try:
+		counter = grafo.random_walks(personaje, cant_caminos, profundidad, adyacentes)
+	except KeyError as e:
+		print(e)
+		return
+	recomendados = sorted(counter, key=counter.get, reverse=True)[:cantidad]  #Arma una lista con los "cantidad" personajes que más aparecen
+	for i in range(len(recomendados) - 1):
+		print(recomendados[i], end=', ')
+	if len(recomendados) > 0:
+		print(recomendados[len(recomendados) - 1])
+	else:
+		print("El personaje no tiene suficientes conexiones")
+
+
 def similares(grafo, personaje, cantidad):
 	''' Llama a la función random_walks para devolver "cantidad" personajes similares 
 	al personaje pasado por parámetro.
@@ -133,7 +153,7 @@ def calcular_aristas_y_promedio_gr_vert(grafo, cant_vertices):
 		for adyacente in grafo.adyacentes(vertice):
 			cant_aristas += 1
 	cant_aristas //= 2
-	promedio_grados_vertices = sumatoria_grados / cant_vertices	
+	promedio_grados_vertices = sumatoria_grados / cant_vertices 
 	return cant_aristas, promedio_grados_vertices
 
 
@@ -164,101 +184,66 @@ def estadisticas(grafo):
 	print("Cantidad de vértices: {}\nCantidad de aristas: {}\nPromedio del grado de cada vértice: {:.2f}\nDesvío estándar del grado de cada vértice: {:.2f}\nDensidad del grafo: {:.10f}".format(cant_vertices, cant_aristas, promedio_grados_vertices, desvio_estandar, densidad))
 
 
-def label_propagation(grafo, label, corte):
-	'''Recibe un grafo, un diccionario llamado label y un valor corte. Esta
-	función realiza el algoritmo label propagation sobre label hasta que este se
-	termina (en caso de que corte sea cero) o hasta que se llegue al número de 
-	iteración indicado por corte. '''
-	frecuencia = {}
-	i = 0
-	max_freq = 0
-	vertice_max_freq = None
-	iguales = True
-	aux = {}
-	vertice_min_label = None
-	min_label = 6450 #para tomar como valor maximo, dsp podemos poner la cant de vertices + 1
-	for clave, valor in label.items():
-		for adyacente in grafo.adyacentes(clave):
-			if not adyacente in frecuencia:
-				frecuencia[adyacente] = 0
-			frecuencia[adyacente] += 1
-		for clave2, valor2 in frecuencia.items():
-			if valor2 not in aux:
-				aux[valor2] = clave2
-		referente = valor2
-		for frec in aux:
-			if frec != referente:
-				iguales = False
-		if iguales:
-			for adyacente in grafo.adyacentes(clave):
-				if label[adyacente] < min_label:
-					min_label = label[adyacente]
-					vertice_min_label = adyacente
-			if vertice_min_label:
-				label[clave] = label[vertice_min_label]
-				vertice_min_label = None
-		else:
-			for clave2, valor2 in aux.items():
-				if clave2 > max_freq:
-					max_freq = clave2
-					vertice_max_freq = valor2
-			if vertice_max_freq:
-				label[clave] = label[vertice_max_freq]
-				vertice_max_freq = None
-				frecuencia = {}
-				max_freq = 0
-		iguales = True
-		if corte:
-			if i == corte:
-				break
-		i += 1
-
-
-def comunidades(grafo, corte=0):
-	'''Recibe un grafo y un valor corte que determina si el algoritmo se hace 
-	hasta un determinado corte o no y cuántas veces itera. Muestra por pantalla 
-	las comunidades que se encuentran en el grafo. '''
-	label_original = {}
-	label_aux = {}
-	i = 0
-	for vertice in grafo.keys():
-		label_original[vertice] = i
-		i += 1
-	label_aux = label_original
-	while True:
-		label_propagation(grafo, label_aux, corte)
-		if(label_aux == label_original):
-			break
-		label_original = label_aux
-	dic_comunidades = {}
-	for clave, valor in label_original.items():
-		if valor not in dic_comunidades:
-			dic_comunidades[valor] = []
-		dic_comunidades[valor].append(clave)
-	numero_comunidad = 1
-	for clave, valor in dic_comunidades.items():
-		print("Comunidad " + str(numero_comunidad) + ":")
-		for integrante in valor:
-			print(integrante + " ")
-		print("----------")
-		numero_comunidad += 1 
-
-
-def random_walks(grafo, personaje, cantidad, cant_caminos, profundidad, adyacentes):
-	''' Recibe el grafo, un personaje, la cantidad de personajes a devolver, la cantidad de caminos,
-	la profundidad del random walk, y un booleano. Si es True se consideran los adyacentes, si es False no.
-	Esto último es así para que la función sea reutilizable. 
-	Imprime los "cantidad" personajes por pantalla. Si no hay personajes, imprime un mensaje de error.
+def max_freq(d):
+	''' Recibe un diccionario con el formato: {clave=label: valor=frecuencia}.
+	Devuelve el label de mayor frecuencia, o el mínimo label en caso de que todos
+	tengan la misma frecuencia.
 	'''
-	try:
-		counter = grafo.random_walks(personaje, cant_caminos, profundidad, adyacentes)
-	except KeyError as e:
-		print(e)
-		return
-	recomendados = sorted(counter, key=counter.get, reverse=True)[:cantidad]  #Arma una lista con los "cantidad" personajes que más aparecen
-	for i in range(len(recomendados) - 1):
-		print(recomendados[i], end=', ')
-	if len(recomendados) > 0:
-		print(recomendados[len(recomendados) - 1])
-	else:
-		print("El personaje no tiene suficientes conexiones")
+	valor = list(d.items())[0][1]
+	if all(val == valor for val in d.values()):
+		return min(d.items(), key=lambda k: k[0])[0]
+	return max(d, key=d.get)
+
+
+def max_freq(l):
+	valor = l[0]
+	if all(val == valor for val in l):
+		return valor
+	return max(set(lst), key=lst.count)
+
+
+def crear_label_d(grafo):
+	label_d = {}
+	i = 0
+	for v in grafo:
+		label_d[v] = i
+		i += 1
+	return label_d
+
+
+def crear_freq_d(grafo, label_d):
+	freq_d = {}
+	for v in label_d:
+		freq_d[v] = {}
+		for w in grafo.adyacentes(v):
+			if label_d[w] not in freq_d[v]:
+				freq_d[v][label_d[w]] = 0
+			freq_d[v][label_d[w]] += 1
+	return freq_d
+
+
+def label_propagation(grafo, corte):
+	label_d = crear_label_d(grafo)
+	freq_d = crear_freq_d(grafo, label_d)
+
+
+def propagate_labels(grafo, label_d, freq_d):
+	for v in grafo:
+		label_viejo = label_d[v]
+		label_d[v] = max_freq(freq_d[v])
+		for w in grafo.adyacentes(v):
+			if freq_d[w][label_viejo] == 1:
+				del freq_d[x][label_viejo]
+			else:
+				freq_d[x][label_viejo] -= 1
+			if label_d[v] not in freq_d[x]:
+				freq_d[x][label_d[v]] = 0
+			freq_d[x][label_d[v]] += 1
+
+
+def propagate_labels_(grafo, label_d):
+	for v in grafo:
+		lista = []
+		[label_d[w] for w in grafo.adyacentes(v)]
+		if len(lista) != 0:
+			label_d[v] = max_freq(lista)
