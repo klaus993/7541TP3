@@ -49,7 +49,7 @@ def validar_comandos(comando):
 
 def camino(grafo, p1, p2):
 	''' Imprime el camino mínimo entre dos personajes p1 y p2.
-	Si alguno de los personajes no está en el grafo, lanza KeyError.
+	Si alguno de los personajes no está en el grafo, atrapa KeyError e imprime un mensaje de error.
 	'''
 	try:
 		caminos = grafo.camino_minimo(p1, p2)
