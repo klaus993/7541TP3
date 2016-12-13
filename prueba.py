@@ -35,21 +35,26 @@ def contar_dist1(grafo, personaje):
 
 def calcular_vertices(grafo):
 	'''Recibe un grafo y calcula su cantidad de vértices. '''
-	lista_idvertices = grafo.keys()
-	return len(lista_idvertices)
+	return len(grafo.keys())
 
-def calcular_aristas_y_promedio_gr_vert(grafo, cant_vertices):
+
+def calcular_aristas(grafo):
 	'''Recibe un grafo y la cantidad de vertices que posee. Devuelve la cantidad
 	de aristas que tiene y el promedio del grado de los vértices.'''
 	cant_aristas = 0
-	sumatoria_grados = 0
 	for vertice in grafo.keys():
-		sumatoria_grados += len(grafo.adyacentes(vertice))
 		for adyacente in grafo.adyacentes(vertice):
 			cant_aristas += 1
 	cant_aristas //= 2
-	promedio_grados_vertices = sumatoria_grados / cant_vertices	
-	return cant_aristas, promedio_grados_vertices
+	return cant_aristas
+
+
+def calcular_promedio_gr_vertices(grafo, cant_vertices):
+	sumatoria_grados = 0
+	for vertice in grafo.keys():
+		sumatoria_grados += len(grafo.adyacentes(vertice))
+	promedio_grados_vertices = sumatoria_grados / cant_vertices
+	return promedio_grados_vertices
 
 def calcular_desvio_estandar(grafo, promedio_grados_vertices, cant_vertices):
 	'''Recibe un grafo junto a su cantidad de vértices y a su promedio del grado
@@ -58,24 +63,26 @@ def calcular_desvio_estandar(grafo, promedio_grados_vertices, cant_vertices):
 	for vertice in grafo.keys():
 		sumatoria_numerador +=  ((len(grafo.adyacentes(vertice)) - promedio_grados_vertices)**2)
 	return math.sqrt(sumatoria_numerador / (cant_vertices - 1)) 
-	
+
+
 def calcular_densidad(grafo, cant_vertices, cant_aristas):
 	'''Recibe un grafo junto a su cantidad de vertices y de aristas y devuelve
 	su densidad. '''
 	cant_max_aristas = cant_vertices * (cant_vertices - 1) / 2
-	densidad = cant_aristas / cant_max_aristas
-	return densidad
-	
+	return cant_aristas / cant_max_aristas
+
 
 def estadisticas(grafo):
 	'''Recibe un grafo e imprime por pantalla la cantidad de vértices y de 
 	aristas que posee, el promedio del grado de los vértices, el desvío estándar
 	del grado de los vértices y por último su densidad. '''
 	cant_vertices = calcular_vertices(grafo)
-	cant_aristas, promedio_grados_vertices = calcular_aristas_y_promedio_gr_vert(grafo, cant_vertices)
+	cant_aristas = calcular_aristas(grafo)
+	promedio_grados_vertices = calcular_promedio_gr_vertices(grafo, cant_vertices)
 	desvio_estandar = calcular_desvio_estandar(grafo, promedio_grados_vertices, cant_vertices)
 	densidad = calcular_densidad(grafo, cant_vertices, cant_aristas)
-	print("Cantidad de vértices: {}\nCantidad de aristas: {}\nPromedio del grado de cada vértice: {}\nDesvío estándar del grado de cada vértice: {}\nDensidad del grafo: {}".format(cant_vertices, cant_aristas, promedio_grados_vertices, desvio_estandar, densidad))
+	print("Cantidad de vértices: {}\nCantidad de aristas: {}\nPromedio del grado de cada vértice: {:.2f}\nDesvío estándar del grado de cada vértice: {:.2f}\nDensidad del grafo: {:.10f}".format(cant_vertices, cant_aristas, promedio_grados_vertices, desvio_estandar, densidad))
+
 
 def label_propagation(grafo, label, corte):
 	'''Recibe un grafo, un diccionario llamado label y un valor corte. Esta
@@ -182,4 +189,4 @@ def grafeo():
 	grafo.agregar_arista("Joaquin", "Juan")
 	comunidades(grafo)
 
-comunidades(grafo)
+estadisticas(grafo)
