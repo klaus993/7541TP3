@@ -1,48 +1,54 @@
 import math
+from collections import Counter
 
+# [0] es cadena vacía
 # [1] es camino
 # [2] es recomendar
 # [3] es similares
-# [4] es centralidad
-# [5] es distancias
-# [6] es estadisticas
-# [7] es comunidades
-# [8] es salir
+# [4] es centralidad_rw
+# [5] es centralidad_exacta
+# [6] es distancias
+# [7] es estadisticas
+# [8] es comunidades
+# [9] es salir
 
-lista_comandos = ["", "camino", "recomendar", "similares", "centralidad", "distancias", "estadisticas", "comunidades", "salir"]
+LISTA_COMANDOS = ["", "camino", "recomendar", "similares", "centralidad_rw", "centalidad_exacta", "distancias", "estadisticas", "comunidades", "salir"]
 
 
 def validar_comando(comando):
 	com = comando.split(" ")
 	if com[0] != "estadisticas" and com[0] != "comunidades" and com[0] != "salir" and com[0] != "" and len(com) == 1:
 		return False
-	return com[0] in lista_comandos
+	return com[0] in LISTA_COMANDOS
 
 
 def validar_comandos(comando):
 	com = comando.split(" ")[0]
-	param = comando[len("camino") + 1:].split(", ")
-	if com == "camino" and len(param) == 2:
+	param = comando[len(LISTA_COMANDOS[1]) + 1:].split(", ")
+	if com == LISTA_COMANDOS[1] and len(param) == 2:
 		return com, param[0], param[1]
-	param = comando[len("recomendar") + 1:].split(", ")
-	if com == "recomendar" and len(param) == 2 and param[1].isdigit():
+	param = comando[len(LISTA_COMANDOS[2]) + 1:].split(", ")
+	if com == LISTA_COMANDOS[2] and len(param) == 2 and param[1].isdigit():
 		return com, param[0], int(param[1])
-	param = comando[len("similares") + 1:].split(", ")
-	if com == "similares" and len(param) == 2 and param[1].isdigit():
+	param = comando[len(LISTA_COMANDOS[3]) + 1:].split(", ")
+	if com == LISTA_COMANDOS[3] and len(param) == 2 and param[1].isdigit():
 		return com, param[0], int(param[1])
-	param = comando[len("centralidad") + 1:].split(", ")
-	if com == "centralidad" and len(param) == 1:
+	param = comando[len(LISTA_COMANDOS[4]) + 1:].split(", ")
+	if com == LISTA_COMANDOS[4] and len(param) == 1 and param[0].isdigit():
 		return com, int(param[0])
-	param = comando[len("distancias") + 1:].split(", ")
-	if com == "distancias" and len(param) == 1:
+	param = comando[len(LISTA_COMANDOS[5]) + 1:].split(", ")
+	if com == LISTA_COMANDOS[5] and len(param) == 1 and param[0].isdigit():
+		return com, int(param[0])
+	param = comando[len(LISTA_COMANDOS[6]) + 1:].split(", ")
+	if com == LISTA_COMANDOS[6] and len(param) == 1:
 		return com, param[0]
-	if comando == "estadisticas":
+	if comando == LISTA_COMANDOS[7]:
 		return com,
-	if comando == "comunidades":
+	if comando == LISTA_COMANDOS[8]:
 		return com,
-	if com == "":
+	if com == LISTA_COMANDOS[0]:
 		return com,
-	if comando == "salir":
+	if comando == LISTA_COMANDOS[9]:
 		return com,
 	return None,
 
@@ -57,18 +63,29 @@ def camino(grafo, p1, p2):
 		print(e)
 		return
 	camino = [p2]
-	camino = _camino(caminos, p1, p2, camino)[::-1]
+	camino = lista_camino(caminos, p1, p2, camino)[::-1]
+	if camino[0] != p1:
+		print("No hay camino desde {} hasta {}.".format(p1, p2))
+		return
 	for i in range(len(camino) - 1):
 		print(camino[i] + ' -> ', end='')
 	print(camino[len(camino) - 1])
 
 
-def _camino(caminos, p1, p2, camino):
-	if caminos[p2].padre == p1:
-		camino.append(caminos[p2].padre)
+def lista_camino(caminos, p1, p2, camino):
+	''' Recibe un diccionario de items (armado por el método camino_minimo) con los siguientes atributos:
+		-dato (id)
+		-distancia
+		-visitado (bool)
+		-padre (id)
+	Y visita recursivamente al padre de p2 hasta llegar a p1,
+	guardando en una lista ("camino") (al revés) el camino mínimo desde p1 hasta p2.
+	Devuelve esa lista. Si no hay camino, la lista 
+	'''
+	if caminos[p2].padre is None:
 		return camino
 	camino.append(caminos[p2].padre)
-	return _camino(caminos, p1, caminos[p2].padre, camino)
+	return lista_camino(caminos, p1, caminos[p2].padre, camino)
 
 
 def random_walks(grafo, personaje, cantidad, cant_caminos, profundidad, adyacentes):
@@ -107,7 +124,7 @@ def recomendar(grafo, personaje, cantidad):
 	random_walks(grafo, personaje, cantidad, 500, 30, adyacentes=False)
 
 
-def centralidad(grafo, cantidad):
+def centralidad_random_walks(grafo, cantidad):
 	''' Llama a la función random_walks para devolver "cantidad" de elementos
 	centrales en el grafo. Inicia en un nodo aleatorio.
 	Realiza 500 random walks de 250 pasos.
@@ -256,5 +273,24 @@ def comunidades(grafo):
 		if len(comunidad_l[i]) > 4 and len(comunidad_l[i]) < 1000:
 			print("--- COMUNIDAD {} ---".format(j))
 			j += 1
-			for p in d[i]:
+			for p in comunidad_l[i]:
 				print(p)
+
+
+def generar_caminos_minimos(grafo):
+	r = []
+	for v in grafo:
+		caminos = grafo.camino_minimo(v)
+		i = 0
+		for w in grafo:
+			l = []
+			l = lista_camino(caminos, v, w, l)[::-1]
+			if len(l) > 0 and v != w::
+				r.extend(l[1:])
+			if i == 10:
+				break
+			i += 1
+	return Counter(r)
+
+def centralidad_exacta(grafo, cantidad):
+	pass

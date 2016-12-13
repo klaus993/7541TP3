@@ -11,7 +11,8 @@ USO_COM = "Uso:\n\
 	> similares <personaje>, [cantidad]\n\
 	> recomendar <personaje>, [cantidad]\n\
 	> camino <personaje_1>, <personaje_2>\n\
-	> centralidad [cantidad]\n\
+	> centralidad_rw [cantidad] (centralidad por random walks)\n\
+	> centralidad_exacta [cantidad] (centralidad exacta por camínos mínimos)\n\
 	> distancias <personaje>\n\
 	> estadisticas\n\
 	> comunidades\n\
@@ -44,23 +45,25 @@ def main():
 				print(USO_COM)
 				continue
 			com_tup = validar_comandos(comando)
-			if com_tup[0] == "camino":
+			if com_tup[0] == LISTA_COMANDOS[1]:
 				camino(grafo, com_tup[1], com_tup[2])
-			elif com_tup[0] == "recomendar":
+			elif com_tup[0] == LISTA_COMANDOS[2]:
 				recomendar(grafo, com_tup[1], com_tup[2])
-			elif com_tup[0] == "similares":
+			elif com_tup[0] == LISTA_COMANDOS[3]:
 				similares(grafo, com_tup[1], com_tup[2])
-			elif com_tup[0] == "centralidad":
-				centralidad(grafo, com_tup[1])
-			elif com_tup[0] == "distancias":
+			elif com_tup[0] == LISTA_COMANDOS[4]:
+				centralidad_random_walks(grafo, com_tup[1])
+			elif com_tup[0] == LISTA_COMANDOS[5]:
+				centralidad_exacta(grafo, com_tup[1])
+			elif com_tup[0] == LISTA_COMANDOS[6]:
 				distancias(grafo, com_tup[1])
-			elif com_tup[0] == "estadisticas":
+			elif com_tup[0] == LISTA_COMANDOS[7]:
 				estadisticas(grafo)
-			elif com_tup[0] == "comunidades":
+			elif com_tup[0] == LISTA_COMANDOS[8]:
 				comunidades(grafo)
-			elif com_tup[0] == "":
+			elif com_tup[0] == LISTA_COMANDOS[0]:
 				pass
-			elif com_tup[0] == "salir":
+			elif com_tup[0] == LISTA_COMANDOS[9]:
 				return
 			else:
 				print(USO_COM)

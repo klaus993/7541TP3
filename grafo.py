@@ -161,9 +161,9 @@ class Grafo(object):
 				padre[v] = None
 				orden[v] = 0
 				if recorrido == "bfs":
-					self.bfs(visitar, extra, v, visitados, padre, orden)
+					self._bfs(visitar, extra, v, visitados, padre, orden)
 				elif recorrido == "dfs":
-					self.dfs(visitar, extra, v, visitados, padre, orden)
+					self._dfs(visitar, extra, v, visitados, padre, orden)
 		return padre, orden
 
 	def _bfs(self, visitar, extra, origen, visitados, padre, orden):
@@ -286,7 +286,7 @@ class Grafo(object):
 				else:
 					if j != personaje:
 						personajes.append(j)
-		return Counter(personajes)  # Recibe la lista "personajes" y la vuelca en un objeto Counter (diccionario) con
+		return Counter(personajes)  # Recibe la lista "personajes" y la vuelca en una instancia del objeto Counter (diccionario) con
 									# los personajes como claves y su cantidad de apariciones como valor.
 
 
@@ -315,7 +315,7 @@ class Item(object):
 		self.padre = None
 
 	def __str__(self):
-		return str((self.dato, self.distancia, self.visitado))
+		return str((self.dato, self.distancia, self.visitado, self.padre))
 
 	def __repr__(self):
 		return str((self.dato, self.distancia, self.visitado, self.padre))
