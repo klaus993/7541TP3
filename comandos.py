@@ -285,7 +285,7 @@ def generar_caminos_minimos(grafo):
 		for w in grafo:
 			l = []
 			l = lista_camino(caminos, v, w, l)[::-1]
-			if len(l) > 0 and v != w::
+			if len(l) > 0 and v != w:
 				r.extend(l[1:])
 			if i == 10:
 				break
