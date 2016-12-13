@@ -19,7 +19,9 @@ USO_COM = "Uso:\n\
 
 
 def main():
-	'''
+	'''Flujo principal. Menú de opciones.
+	Manejo de excepciones por mala entrada de usuario y validación del archivo.
+	El programa termina en caso de ingresarse "salir" o lanzar EOFError (Ctrl-D).
 	'''
 	try:
 		if sys.argv[1][-3:] != "pjk":

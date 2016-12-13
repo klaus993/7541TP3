@@ -67,7 +67,7 @@ def _camino(caminos, p1, p2, camino):
 	if caminos[p2].padre == p1:
 		camino.append(caminos[p2].padre)
 		return camino
-].padre)
+	camino.append(caminos[p2].padre)
 	return _camino(caminos, p1, caminos[p2].padre, camino)
 
 
@@ -190,13 +190,21 @@ def estadisticas(grafo):
 
 
 def max_freq(l):
-	valor = min(l)
+	''' Devuelve el label de máxima frecuencia, o en su defecto
+	(si son todos iguales) devuelve el mínimo.
+	'''
+	valor = l[0]
 	if all(val == valor for val in l):
 		return valor
-	return max(set(l), key=l.count)
+	return max(set(l), key=l.count)  # Devuelve el de mayor frecuencia o el mínimo.
 
 
 def crear_label_d(grafo):
+	''' Crea un diccionario de nombres de personajes como claves
+	y sus labels como valores, recorriendo el diccionario en un orden aleatorio
+	asignando labels de 0 a len(grafo)-1.
+	Devuelve el diccionario.
+	'''
 	label_d = {}
 	i = 0
 	for v in grafo:
@@ -206,6 +214,9 @@ def crear_label_d(grafo):
 
 
 def propagate_labels(grafo, label_d):
+	''' Hace una iteración del algoritmo label propagation sobre un diccionario
+	de labels pasado por parámetro. El diccionario de labels sólo puede tener labels positivos.
+	'''
 	for v in grafo:
 		lista_adyacentes = [label_d[w] for w in grafo.adyacentes(v)]
 		if len(lista_adyacentes) != 0:
@@ -213,20 +224,36 @@ def propagate_labels(grafo, label_d):
 
 
 def label_propagation(grafo, cant):
+	''' Realiza el algoritmo label propagation "cant" veces sobre el grado pasado por parámetro,
+	y devuelve el diccionario de labels resultante.
+	'''
 	label_d = crear_label_d(grafo)
 	for i in range(cant):
 		propagate_labels(grafo, label_d)
 	return label_d
 
 
-def comunidades(grafo):
-	label_d = label_propagation(grafo, 30)
+def listas_de_comunidades(grafo, label_d):
+	''' Crea una lista de listas de comunidades del grafo, dado un diccionario de labels.
+	Agrupa las comunidades por label. Crea len(grafo) listas, aunque algunos labels no tengan
+	comunidad.
+	'''
 	d = []
 	for i in range(len(grafo)):
 		d.append([v for v in label_d if label_d[v] == i])
+	return d
+
+
+def comunidades(grafo):
+	''' Calcula e imprime las comunidades del grafo, realizando el algoritmo
+	label propagation 30 veces sobre un grafo.i
+	Filtra las comunidades con menos de 4 personajes y más de 1000.
+	'''
+	label_d = label_propagation(grafo, 30)
+	comunidad_l = listas_de_comunidades(grafo, label_d)
 	j = 1
 	for i in range(len(grafo)):
-		if len(d[i]) > 4 and len(d[i]) < 1000:
+		if len(comunidad_l[i]) > 4 and len(comunidad_l[i]) < 1000:
 			print("--- COMUNIDAD {} ---".format(j))
 			j += 1
 			for p in d[i]:
