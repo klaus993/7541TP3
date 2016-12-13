@@ -277,20 +277,41 @@ def comunidades(grafo):
 				print(p)
 
 
+def ordenar_vertices(caminos):
+	''' Recibe un diccionario de Items (caminos) y devuelve una lista de los items
+	ordenados de mayor a menor (por distancia).
+	'''
+	aux = caminos.copy()
+	# j = 0
+	for i in caminos:
+		if aux[i].distancia == float('inf'):
+			# print("{} - Es inf".format(j))
+			# j += 1
+			aux.pop(i)
+	return sorted(aux, key=aux.get, reverse=True)
+
+
 def generar_caminos_minimos(grafo):
-	r = []
+	cont = {}
 	for v in grafo:
+		cont[v] = 0
+	j = 0
+	for v in grafo:
+		print("V =", str(v) + " ,,, " + str(j)); j+=1
 		caminos = grafo.camino_minimo(v)
-		i = 0
+		cont_aux = {}
 		for w in grafo:
-			l = []
-			l = lista_camino(caminos, v, w, l)[::-1]
-			if len(l) > 0 and v != w:
-				r.extend(l[1:])
-			if i == 10:
-				break
-			i += 1
-	return Counter(r)
+			cont_aux[w] = 0
+		vertices_ordenados = ordenar_vertices(caminos)
+		for w in vertices_ordenados:
+			print("--- W =",w)
+			if caminos[w].distancia != float('inf') and caminos[w].padre is not None:
+				cont_aux[caminos[w].padre] += 1 + cont_aux[w]
+		for w in grafo:
+			if w != v:
+				cont[w] += cont_aux[w]
+	return cont
+
 
 def centralidad_exacta(grafo, cantidad):
 	pass

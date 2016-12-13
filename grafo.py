@@ -4,8 +4,6 @@ from itertools import repeat
 from collections import Counter
 import random
 
-INFINITO = float('inf')
-
 visitar_nulo = lambda a, b, c, d: True
 
 VS_NOT_FOUND = "Algun/ambos vertice/s pasados no se encuentra/n en el grafo"
@@ -220,7 +218,7 @@ class Grafo(object):
 		items = {}
 		for i in self:
 			if i != origen:
-				items[i] = Item(i, INFINITO, visitado=False)
+				items[i] = Item(i, float('inf'), visitado=False)
 			else:
 				items[i] = Item(i, 0, visitado=True)
 		q = Heap()
