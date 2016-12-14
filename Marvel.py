@@ -1,16 +1,18 @@
 #!/usr/bin/python3
 
-from time import sleep
 from parse import parse
 from grafo import Grafo
 from comandos import *
 import sys
 
-USO = "Uso:\n\
+USO_PROG = "Uso: {} <archivo>"
+
+USO_COM = "Uso:\n\
 	> similares <personaje>, [cantidad]\n\
 	> recomendar <personaje>, [cantidad]\n\
 	> camino <personaje_1>, <personaje_2>\n\
-	> centralidad [cantidad]\n\
+	> centralidad_rw [cantidad] (centralidad por random walks)\n\
+	> centralidad_exacta [cantidad] (centralidad exacta por camínos mínimos)\n\
 	> distancias <personaje>\n\
 	> estadisticas\n\
 	> comunidades\n\
@@ -18,16 +20,16 @@ USO = "Uso:\n\
 
 
 def main():
-	'''Main. Hay que arreglar los if, elif, etc ya que las validaciones de cada comando son un choclo.
-	Habría que ponerlas en funciones aparte, pero lo voy a hacer al final porque no es algo crucial, son detalles.
-	El try except es por si el usuario toca Control+C o Control+D, para que no termine el programa.
+	'''Flujo principal. Menú de opciones.
+	Manejo de excepciones por mala entrada de usuario y validación del archivo.
+	El programa termina en caso de ingresarse "salir" o lanzar EOFError (Ctrl-D).
 	'''
 	try:
 		if sys.argv[1][-3:] != "pjk":
 			print("El archivo indicado debe ser formato pajek (.pjk)")
 			return
 	except IndexError:
-		print("Uso: {} <archivo>".format(sys.argv[0]))
+		print(USO_PROG.format(sys.argv[0]))
 		return
 	try:
 		grafo = parse(sys.argv[1])
@@ -35,34 +37,36 @@ def main():
 		print("El archivo {} no existe.".format(sys.argv[1]))
 		return
 	print("¡Bienvenido al mundo de Marvel!")
-	print(USO)
+	print(USO_COM)
 	while True:
 		try:
 			comando = input("> ")
 			if not validar_comando(comando):
-				print(USO)
+				print(USO_COM)
 				continue
 			com_tup = validar_comandos(comando)
-			if com_tup[0] == "camino":
+			if com_tup[0] == LISTA_COMANDOS[1]:
 				camino(grafo, com_tup[1], com_tup[2])
-			elif com_tup[0] == "recomendar":
+			elif com_tup[0] == LISTA_COMANDOS[2]:
 				recomendar(grafo, com_tup[1], com_tup[2])
-			elif com_tup[0] == "similares":
+			elif com_tup[0] == LISTA_COMANDOS[3]:
 				similares(grafo, com_tup[1], com_tup[2])
-			elif com_tup[0] == "centralidad":
-				centralidad(grafo, com_tup[1])
-			elif com_tup[0] == "distancias":
+			elif com_tup[0] == LISTA_COMANDOS[4]:
+				centralidad_random_walks(grafo, com_tup[1])
+			elif com_tup[0] == LISTA_COMANDOS[5]:
+				centralidad_exacta(grafo, com_tup[1])
+			elif com_tup[0] == LISTA_COMANDOS[6]:
 				distancias(grafo, com_tup[1])
-			elif com_tup[0] == "estadisticas":
+			elif com_tup[0] == LISTA_COMANDOS[7]:
 				estadisticas(grafo)
-			elif com_tup[0] == "comunidades":
+			elif com_tup[0] == LISTA_COMANDOS[8]:
+				comunidades(grafo)
+			elif com_tup[0] == LISTA_COMANDOS[0]:
 				pass
-			elif com_tup[0] == "":
-				pass
-			elif com_tup[0] == "salir":
-				raise EOFError
+			elif com_tup[0] == LISTA_COMANDOS[9]:
+				return
 			else:
-				print(USO)
+				print(USO_COM)
 		except KeyboardInterrupt:
 			print()
 			continue

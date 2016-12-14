@@ -1,56 +1,61 @@
-from parse import *
 import math
+from collections import Counter
 
-# 1 es camino
-# 2 es recomendar
-# 3 es similares
-# 4 es centralidad
-# 5 es distancias
-# 6 es estadisticas
-# 7 es comunidades
-# 8 es salir
+# [0] es cadena vacía
+# [1] es camino
+# [2] es recomendar
+# [3] es similares
+# [4] es centralidad_rw
+# [5] es centralidad_exacta
+# [6] es distancias
+# [7] es estadisticas
+# [8] es comunidades
+# [9] es salir
 
-lista_comandos = ["", "camino", "recomendar", "similares", "centralidad", "distancias", "estadisticas", "comunidades", "salir"]
+LISTA_COMANDOS = ["", "camino", "recomendar", "similares", "centralidad_rw", "centalidad_exacta", "distancias", "estadisticas", "comunidades", "salir"]
 
 
 def validar_comando(comando):
 	com = comando.split(" ")
 	if com[0] != "estadisticas" and com[0] != "comunidades" and com[0] != "salir" and com[0] != "" and len(com) == 1:
 		return False
-	return com[0] in lista_comandos
+	return com[0] in LISTA_COMANDOS
 
 
 def validar_comandos(comando):
 	com = comando.split(" ")[0]
-	param = comando[len("camino") + 1:].split(", ")
-	if com == "camino" and len(param) == 2:
+	param = comando[len(LISTA_COMANDOS[1]) + 1:].split(", ")
+	if com == LISTA_COMANDOS[1] and len(param) == 2:
 		return com, param[0], param[1]
-	param = comando[len("recomendar") + 1:].split(", ")
-	if com == "recomendar" and len(param) == 2 and param[1].isdigit():
+	param = comando[len(LISTA_COMANDOS[2]) + 1:].split(", ")
+	if com == LISTA_COMANDOS[2] and len(param) == 2 and param[1].isdigit():
 		return com, param[0], int(param[1])
-	param = comando[len("similares") + 1:].split(", ")
-	if com == "similares" and len(param) == 2 and param[1].isdigit():
+	param = comando[len(LISTA_COMANDOS[3]) + 1:].split(", ")
+	if com == LISTA_COMANDOS[3] and len(param) == 2 and param[1].isdigit():
 		return com, param[0], int(param[1])
-	param = comando[len("centralidad") + 1:].split(", ")
-	if com == "centralidad" and len(param) == 1:
+	param = comando[len(LISTA_COMANDOS[4]) + 1:].split(", ")
+	if com == LISTA_COMANDOS[4] and len(param) == 1 and param[0].isdigit():
 		return com, int(param[0])
-	param = comando[len("distancias") + 1:].split(", ")
-	if com == "distancias" and len(param) == 1:
+	param = comando[len(LISTA_COMANDOS[5]) + 1:].split(", ")
+	if com == LISTA_COMANDOS[5] and len(param) == 1 and param[0].isdigit():
+		return com, int(param[0])
+	param = comando[len(LISTA_COMANDOS[6]) + 1:].split(", ")
+	if com == LISTA_COMANDOS[6] and len(param) == 1:
 		return com, param[0]
-	if com == "estadisticas":
+	if comando == LISTA_COMANDOS[7]:
 		return com,
-	if com == "comunidades":
+	if comando == LISTA_COMANDOS[8]:
 		return com,
-	if com == "":
+	if com == LISTA_COMANDOS[0]:
 		return com,
-	if com == "salir":
+	if comando == LISTA_COMANDOS[9]:
 		return com,
 	return None,
 
 
 def camino(grafo, p1, p2):
 	''' Imprime el camino mínimo entre dos personajes p1 y p2.
-	Si alguno de los personajes no está en el grafo, lanza KeyError.
+	Si alguno de los personajes no está en el grafo, atrapa KeyError e imprime un mensaje de error.
 	'''
 	try:
 		caminos = grafo.camino_minimo(p1, p2)
@@ -58,22 +63,53 @@ def camino(grafo, p1, p2):
 		print(e)
 		return
 	camino = [p2]
-	camino = _camino(caminos, p1, p2, camino)[::-1]
+	camino = lista_camino(caminos, p1, p2, camino)[::-1]
+	if camino[0] != p1:
+		print("No hay camino desde {} hasta {}.".format(p1, p2))
+		return
 	for i in range(len(camino) - 1):
 		print(camino[i] + ' -> ', end='')
 	print(camino[len(camino) - 1])
 
 
-def _camino(caminos, p1, p2, camino):
-	if caminos[p2].padre == p1:
-		camino.append(caminos[p2].padre)
+def lista_camino(caminos, p1, p2, camino):
+	''' Recibe un diccionario de items (armado por el método camino_minimo) con los siguientes atributos:
+		-dato (id)
+		-distancia
+		-visitado (bool)
+		-padre (id)
+	Y visita recursivamente al padre de p2 hasta llegar a p1,
+	guardando en una lista ("camino") (al revés) el camino mínimo desde p1 hasta p2.
+	Devuelve esa lista. Si no hay camino, la lista 
+	'''
+	if caminos[p2].padre is None:
 		return camino
 	camino.append(caminos[p2].padre)
-	return _camino(caminos, p1, caminos[p2].padre, camino)
+	return lista_camino(caminos, p1, caminos[p2].padre, camino)
+
+
+def random_walks(grafo, personaje, cantidad, cant_caminos, profundidad, adyacentes):
+	''' Recibe el grafo, un personaje, la cantidad de personajes a devolver, la cantidad de caminos,
+	la profundidad del random walk, y un booleano. Si es True se consideran los adyacentes, si es False no.
+	Esto último es así para que la función sea reutilizable.
+	Imprime los "cantidad" personajes por pantalla. Si no hay personajes, imprime un mensaje de error.
+	'''
+	try:
+		counter = grafo.random_walks(personaje, cant_caminos, profundidad, adyacentes)
+	except KeyError as e:
+		print(e)
+		return
+	recomendados = sorted(counter, key=counter.get, reverse=True)[:cantidad]  #Arma una lista con los "cantidad" personajes que más aparecen
+	for i in range(len(recomendados) - 1):
+		print(recomendados[i], end=', ')
+	if len(recomendados) > 0:
+		print(recomendados[len(recomendados) - 1])
+	else:
+		print("El personaje no tiene suficientes conexiones")
 
 
 def similares(grafo, personaje, cantidad):
-	''' Llama a la función random_walks para devolver "cantidad" personajes similares 
+	''' Llama a la función random_walks para devolver "cantidad" personajes similares
 	al personaje pasado por parámetro.
 	Realiza 500 caminos de 50 pasos.
 	'''
@@ -88,7 +124,7 @@ def recomendar(grafo, personaje, cantidad):
 	random_walks(grafo, personaje, cantidad, 500, 30, adyacentes=False)
 
 
-def centralidad(grafo, cantidad):
+def centralidad_random_walks(grafo, cantidad):
 	''' Llama a la función random_walks para devolver "cantidad" de elementos
 	centrales en el grafo. Inicia en un nodo aleatorio.
 	Realiza 500 random walks de 250 pasos.
@@ -97,9 +133,9 @@ def centralidad(grafo, cantidad):
 
 
 def generar_distancias(v, padre, orden, dic_distancias):
-	'''Función que recibe un vértice, un diccionario desde el cual se puede 
+	'''Función que recibe un vértice, un diccionario desde el cual se puede
 	acceder al padre del vértice, otro desde el cual se puede acceder a su orden
-	y uno más donde se almacenan las distancias y la cantidad de vértices que 
+	y uno más donde se almacenan las distancias y la cantidad de vértices que
 	cumplen esa distancia a un origen como valores. La función agrega justamente
 	a este último diccionario la distancia del vértice y le aumenta en uno
 	su valor. '''
@@ -149,7 +185,7 @@ def calcular_desvio_estandar(grafo, promedio_grados_vertices, cant_vertices):
 	sumatoria_numerador = 0
 	for vertice in grafo.keys():
 		sumatoria_numerador +=  ((len(grafo.adyacentes(vertice)) - promedio_grados_vertices)**2)
-	return math.sqrt(sumatoria_numerador / (cant_vertices - 1)) 
+	return math.sqrt(sumatoria_numerador / (cant_vertices - 1))
 
 
 def calcular_densidad(grafo, cant_vertices, cant_aristas):
@@ -160,7 +196,7 @@ def calcular_densidad(grafo, cant_vertices, cant_aristas):
 
 
 def estadisticas(grafo):
-	'''Recibe un grafo e imprime por pantalla la cantidad de vértices y de 
+	'''Recibe un grafo e imprime por pantalla la cantidad de vértices y de
 	aristas que posee, el promedio del grado de los vértices, el desvío estándar
 	del grado de los vértices y por último su densidad. '''
 	cant_vertices = calcular_vertices(grafo)
@@ -171,101 +207,112 @@ def estadisticas(grafo):
 	print("Cantidad de vértices: {}\nCantidad de aristas: {}\nPromedio del grado de cada vértice: {:.2f}\nDesvío estándar del grado de cada vértice: {:.2f}\nDensidad del grafo: {:.10f}".format(cant_vertices, cant_aristas, promedio_grados_vertices, desvio_estandar, densidad))
 
 
-def label_propagation(grafo, label, corte):
-	'''Recibe un grafo, un diccionario llamado label y un valor corte. Esta
-	función realiza el algoritmo label propagation sobre label hasta que este se
-	termina (en caso de que corte sea cero) o hasta que se llegue al número de 
-	iteración indicado por corte. '''
-	frecuencia = {}
-	i = 0
-	max_freq = 0
-	vertice_max_freq = None
-	iguales = True
-	aux = {}
-	vertice_min_label = None
-	min_label = 6450 #para tomar como valor maximo, dsp podemos poner la cant de vertices + 1
-	for clave, valor in label.items():
-		for adyacente in grafo.adyacentes(clave):
-			if not adyacente in frecuencia:
-				frecuencia[adyacente] = 0
-			frecuencia[adyacente] += 1
-		for clave2, valor2 in frecuencia.items():
-			if valor2 not in aux:
-				aux[valor2] = clave2
-		referente = valor2
-		for frec in aux:
-			if frec != referente:
-				iguales = False
-		if iguales:
-			for adyacente in grafo.adyacentes(clave):
-				if label[adyacente] < min_label:
-					min_label = label[adyacente]
-					vertice_min_label = adyacente
-			if vertice_min_label:
-				label[clave] = label[vertice_min_label]
-				vertice_min_label = None
-		else:
-			for clave2, valor2 in aux.items():
-				if clave2 > max_freq:
-					max_freq = clave2
-					vertice_max_freq = valor2
-			if vertice_max_freq:
-				label[clave] = label[vertice_max_freq]
-				vertice_max_freq = None
-				frecuencia = {}
-				max_freq = 0
-		iguales = True
-		if corte:
-			if i == corte:
-				break
-		i += 1
-
-
-def comunidades(grafo, corte=0):
-	'''Recibe un grafo y un valor corte que determina si el algoritmo se hace 
-	hasta un determinado corte o no y cuántas veces itera. Muestra por pantalla 
-	las comunidades que se encuentran en el grafo. '''
-	label_original = {}
-	label_aux = {}
-	i = 0
-	for vertice in grafo.keys():
-		label_original[vertice] = i
-		i += 1
-	label_aux = label_original
-	while True:
-		label_propagation(grafo, label_aux, corte)
-		if(label_aux == label_original):
-			break
-		label_original = label_aux
-	dic_comunidades = {}
-	for clave, valor in label_original.items():
-		if valor not in dic_comunidades:
-			dic_comunidades[valor] = []
-		dic_comunidades[valor].append(clave)
-	numero_comunidad = 1
-	for clave, valor in dic_comunidades.items():
-		print("Comunidad " + str(numero_comunidad) + ":")
-		for integrante in valor:
-			print(integrante + " ")
-		print("----------")
-		numero_comunidad += 1 
-
-
-def random_walks(grafo, personaje, cantidad, cant_caminos, profundidad, adyacentes):
-	''' Recibe el grafo, un personaje, la cantidad de personajes a devolver, la cantidad de caminos,
-	la profundidad del random walk, y un booleano. Si es True se consideran los adyacentes, si es False no.
-	Esto último es así para que la función sea reutilizable. 
-	Imprime los "cantidad" personajes por pantalla. Si no hay personajes, imprime un mensaje de error.
+def max_freq(l):
+	''' Devuelve el label de máxima frecuencia, o en su defecto
+	(si son todos iguales) devuelve el mínimo.
 	'''
-	try:
-		counter = grafo.random_walks(personaje, cant_caminos, profundidad, adyacentes)
-	except KeyError as e:
-		print(e)
-		return
-	recomendados = sorted(counter, key=counter.get, reverse=True)[:cantidad]  #Arma una lista con los "cantidad" personajes que más aparecen
-	for i in range(len(recomendados) - 1):
-		print(recomendados[i], end=', ')
-	if len(recomendados) > 0:
-		print(recomendados[len(recomendados) - 1])
-	else:
-		print("El personaje no tiene suficientes conexiones")
+	valor = l[0]
+	if all(val == valor for val in l):
+		return valor
+	return max(set(l), key=l.count)  # Devuelve el de mayor frecuencia o el mínimo.
+
+
+def crear_label_d(grafo):
+	''' Crea un diccionario de nombres de personajes como claves
+	y sus labels como valores, recorriendo el diccionario en un orden aleatorio
+	asignando labels de 0 a len(grafo)-1.
+	Devuelve el diccionario.
+	'''
+	label_d = {}
+	i = 0
+	for v in grafo:
+		label_d[v] = i
+		i += 1
+	return label_d
+
+
+def propagate_labels(grafo, label_d):
+	''' Hace una iteración del algoritmo label propagation sobre un diccionario
+	de labels pasado por parámetro. El diccionario de labels sólo puede tener labels positivos.
+	'''
+	for v in grafo:
+		lista_adyacentes = [label_d[w] for w in grafo.adyacentes(v)]
+		if len(lista_adyacentes) != 0:
+			label_d[v] = max_freq(lista_adyacentes)
+
+
+def label_propagation(grafo, cant):
+	''' Realiza el algoritmo label propagation "cant" veces sobre el grado pasado por parámetro,
+	y devuelve el diccionario de labels resultante.
+	'''
+	label_d = crear_label_d(grafo)
+	for i in range(cant):
+		propagate_labels(grafo, label_d)
+	return label_d
+
+
+def listas_de_comunidades(grafo, label_d):
+	''' Crea una lista de listas de comunidades del grafo, dado un diccionario de labels.
+	Agrupa las comunidades por label. Crea len(grafo) listas, aunque algunos labels no tengan
+	comunidad.
+	'''
+	d = []
+	for i in range(len(grafo)):
+		d.append([v for v in label_d if label_d[v] == i])
+	return d
+
+
+def comunidades(grafo):
+	''' Calcula e imprime las comunidades del grafo, realizando el algoritmo
+	label propagation 30 veces sobre un grafo.i
+	Filtra las comunidades con menos de 4 personajes y más de 1000.
+	'''
+	label_d = label_propagation(grafo, 30)
+	comunidad_l = listas_de_comunidades(grafo, label_d)
+	j = 1
+	for i in range(len(grafo)):
+		if len(comunidad_l[i]) > 4 and len(comunidad_l[i]) < 1000:
+			print("--- COMUNIDAD {} ---".format(j))
+			j += 1
+			for p in comunidad_l[i]:
+				print(p)
+
+
+def ordenar_vertices(caminos):
+	''' Recibe un diccionario de Items (caminos) y devuelve una lista de los items
+	ordenados de mayor a menor (por distancia).
+	'''
+	aux = caminos.copy()
+	# j = 0
+	for i in caminos:
+		if aux[i].distancia == float('inf'):
+			# print("{} - Es inf".format(j))
+			# j += 1
+			aux.pop(i)
+	return sorted(aux, key=aux.get, reverse=True)
+
+
+def generar_caminos_minimos(grafo):
+	cont = {}
+	for v in grafo:
+		cont[v] = 0
+	j = 0
+	for v in grafo:
+		print("V =", str(v) + " ,,, " + str(j)); j+=1
+		caminos = grafo.camino_minimo(v)
+		cont_aux = {}
+		for w in grafo:
+			cont_aux[w] = 0
+		vertices_ordenados = ordenar_vertices(caminos)
+		for w in vertices_ordenados:
+			print("--- W =",w)
+			if caminos[w].distancia != float('inf') and caminos[w].padre is not None:
+				cont_aux[caminos[w].padre] += 1 + cont_aux[w]
+		for w in grafo:
+			if w != v:
+				cont[w] += cont_aux[w]
+	return cont
+
+
+def centralidad_exacta(grafo, cantidad):
+	pass

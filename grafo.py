@@ -3,12 +3,8 @@ from heapq import *
 from itertools import repeat
 from collections import Counter
 import random
-import pdb
-
-INFINITO = float('inf')
 
 visitar_nulo = lambda a, b, c, d: True
-heuristica_nula = lambda actual, destino: 0
 
 VS_NOT_FOUND = "Algun/ambos vertice/s pasados no se encuentra/n en el grafo"
 V_NOT_FOUND = "El vertice {} no se encuentra en el grafo."
@@ -33,10 +29,7 @@ class Grafo(object):
 
 	def __len__(self):
 		'''Devuelve la cantidad de vertices del grafo'''
-		cant_vertices = 0
-		for vertice in self.vertices:
-			cant_vertices += 1
-		return cant_vertices
+		return len(self.vertices)
 
 	def __iter__(self):
 		'''Devuelve un iterador de vertices, sin ningun tipo de relacion entre los consecutivos'''
@@ -158,20 +151,23 @@ class Grafo(object):
 			padre[inicio] = None
 			orden[inicio] = 0
 			if recorrido == "bfs":
-				self.bfs(visitar, extra, inicio, visitados, padre, orden)
+				self._bfs(visitar, extra, inicio, visitados, padre, orden)
 			elif recorrido == "dfs":
-				self.dfs(visitar, extra, inicio, visitados, padre, orden)
+				self._dfs(visitar, extra, inicio, visitados, padre, orden)
 		for v in self.vertices:
 			if v not in visitados:
 				padre[v] = None
 				orden[v] = 0
 				if recorrido == "bfs":
-					self.bfs(visitar, extra, v, visitados, padre, orden)
+					self._bfs(visitar, extra, v, visitados, padre, orden)
 				elif recorrido == "dfs":
-					self.dfs(visitar, extra, v, visitados, padre, orden)
+					self._dfs(visitar, extra, v, visitados, padre, orden)
 		return padre, orden
 
-	def bfs(self, visitar, extra, origen, visitados, padre, orden):
+	def _bfs(self, visitar, extra, origen, visitados, padre, orden):
+		''' Recorrido Breadth-first Search sobre el grafo.d
+		Método privado.
+		'''
 		d = deque()
 		d.append(origen)
 		visitados[origen] = True
@@ -187,31 +183,33 @@ class Grafo(object):
 						if visitar(u, padre, orden, extra) == False:
 							return
 
-	def dfs(self, visitar, extra, origen, visitados, padre, orden):
+	def _dfs(self, visitar, extra, origen, visitados, padre, orden):
+		''' Recorrido Depth-first Search sobre el grafo.
+		Método privado.
+		'''
 		visitados[origen] = True
 		for w in self.adyacentes(origen):
 			if w not in visitados:
 				padre[w] = origen
 				orden[w] = orden[origen] + 1
-				if visitar(w, padre, orden, extra) == False:
-					return
-				self.dfs(visitar, extra, w, visitados, padre, orden)
+				if not visitar(w, padre, orden, extra):
+					return False
+				if not self._dfs(visitar, extra, w, visitados, padre, orden):
+					return False
+		return True
 
-	def componentes_conexas(self):
-		'''Devuelve una lista de listas con componentes conexas. Cada componente conexa es representada con una lista, con los identificadores de sus vertices.
-		Solamente tiene sentido de aplicar en grafos no dirigidos, por lo que
-		en caso de aplicarse a un grafo dirigido se lanzara TypeError'''
-		raise NotImplementedError()
-
-	def camino_minimo(self, origen, destino=None, heuristica=heuristica_nula):
-		'''Devuelve el recorrido minimo desde el origen hasta el destino, aplicando el algoritmo de Dijkstra, o bien
-		A* en caso que la heuristica no sea nula. Parametros:
+	def camino_minimo(self, origen, destino=None):
+		'''Devuelve el recorrido minimo desde el origen hasta el destino, aplicando el algoritmo de Dijkstra. Parametros:
 			- origen y destino: identificadores de vertices dentro del grafo. Si alguno de estos no existe dentro del grafo, lanzara KeyError.
-			- heuristica: funcion que recibe dos parametros (un vertice y el destino) y nos devuelve la 'distancia' a tener en cuenta para ajustar los resultados y converger mas rapido.
-			Por defecto, la funcion nula (devuelve 0 siempre)
 		Devuelve:
-			- Listado de vertices (identificadores) ordenado con el recorrido, incluyendo a los vertices de origen y destino. 
-			En caso que no exista camino entre el origen y el destino, se devuelve None. 
+			- Diccionario de items (objetos Item) con datos:
+				-dato (id)
+				-distancia
+				-visitado (bool)
+				-padre (id)
+			 para poder armar el camino mínimo.
+			En caso que no exista camino entre el origen y el destino, el atributo distancia del item será "inf"
+			y el padre None
 		'''
 		if origen not in self.vertices:
 			raise KeyError(V_NOT_FOUND.format(origen))
@@ -220,9 +218,9 @@ class Grafo(object):
 		items = {}
 		for i in self:
 			if i != origen:
-				items[i] = Item(i, INFINITO)
+				items[i] = Item(i, float('inf'), visitado=False)
 			else:
-				items[i] = Item(i, 0, True)
+				items[i] = Item(i, 0, visitado=True)
 		q = Heap()
 		q.push(items[origen])
 		cortar = False
@@ -241,11 +239,6 @@ class Grafo(object):
 			if cortar:
 				break
 		return items
-
-	def mst(self):
-		'''Calcula el Arbol de Tendido Minimo (MST) para un grafo no dirigido. En caso de ser dirigido, lanza una excepcion.
-		Devuelve: un nuevo grafo, con los mismos vertices que el original, pero en forma de MST.'''
-		raise NotImplementedError()
 
 	def random_walk(self, largo, origen=None, pesado=True):
 		''' Devuelve una lista con un recorrido aleatorio de grafo.
@@ -291,7 +284,7 @@ class Grafo(object):
 				else:
 					if j != personaje:
 						personajes.append(j)
-		return Counter(personajes)  # Recibe la lista "personajes" y la vuelca en un objeto Counter (diccionario) con
+		return Counter(personajes)  # Recibe la lista "personajes" y la vuelca en una instancia del objeto Counter (diccionario) con
 									# los personajes como claves y su cantidad de apariciones como valor.
 
 
@@ -309,6 +302,9 @@ def vertice_aleatorio(pesos):
 
 
 class Item(object):
+	'''Clase Item, utilizada en el algoritmo de camino mínimo para almacenar
+	datos de un nodo.
+	'''
 
 	def __init__(self, dato, distancia, visitado=False):
 		self.dato = dato
@@ -317,7 +313,7 @@ class Item(object):
 		self.padre = None
 
 	def __str__(self):
-		return str((self.dato, self.distancia, self.visitado))
+		return str((self.dato, self.distancia, self.visitado, self.padre))
 
 	def __repr__(self):
 		return str((self.dato, self.distancia, self.visitado, self.padre))

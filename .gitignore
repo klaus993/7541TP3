@@ -87,3 +87,6 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+*.py.*.4458.py
+*.py.orig
