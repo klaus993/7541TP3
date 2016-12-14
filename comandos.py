@@ -12,7 +12,7 @@ from collections import Counter
 # [8] es comunidades
 # [9] es salir
 
-LISTA_COMANDOS = ["", "camino", "recomendar", "similares", "centralidad_rw", "centalidad_exacta", "distancias", "estadisticas", "comunidades", "salir"]
+LISTA_COMANDOS = ["", "camino", "recomendar", "similares", "centralidad_rw", "centralidad_exacta", "distancias", "estadisticas", "comunidades", "salir"]
 
 
 def validar_comando(comando):
@@ -279,14 +279,11 @@ def comunidades(grafo):
 
 def ordenar_vertices(caminos):
 	''' Recibe un diccionario de Items (caminos) y devuelve una lista de los items
-	ordenados de mayor a menor (por distancia).
+	ordenados de mayor a menor (por distancia) sin incluir los de distancia infinito.
 	'''
 	aux = caminos.copy()
-	# j = 0
 	for i in caminos:
 		if aux[i].distancia == float('inf'):
-			# print("{} - Es inf".format(j))
-			# j += 1
 			aux.pop(i)
 	return sorted(aux, key=aux.get, reverse=True)
 
@@ -295,8 +292,9 @@ def generar_caminos_minimos(grafo):
 	cont = {}
 	for v in grafo:
 		cont[v] = 0
-	j = 0
+	j = 1
 	for v in grafo:
+		if j == 20: break
 		print("V =", str(v) + " ,,, " + str(j)); j+=1
 		caminos = grafo.camino_minimo(v)
 		cont_aux = {}
@@ -304,7 +302,7 @@ def generar_caminos_minimos(grafo):
 			cont_aux[w] = 0
 		vertices_ordenados = ordenar_vertices(caminos)
 		for w in vertices_ordenados:
-			print("--- W =",w)
+			#print("--- W =",w)
 			if caminos[w].distancia != float('inf') and caminos[w].padre is not None:
 				cont_aux[caminos[w].padre] += 1 + cont_aux[w]
 		for w in grafo:
@@ -314,4 +312,8 @@ def generar_caminos_minimos(grafo):
 
 
 def centralidad_exacta(grafo, cantidad):
-	pass
+	cont = generar_caminos_minimos(grafo)
+	centrales = sorted(cont, key=cont.get, reverse=True)[:cantidad]
+	for i in range(len(centrales) - 1):
+		print(centrales[i], end=', ')
+	print(centrales[len(centrales) - 1])
