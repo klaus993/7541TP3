@@ -103,6 +103,7 @@ def generar_distancias(v, padre, orden, dic_distancias):
 	cumplen esa distancia a un origen como valores. La función agrega justamente
 	a este último diccionario la distancia del vértice y le aumenta en uno
 	su valor. '''
+	print (v,)
 	if orden[v] not in dic_distancias:
 		dic_distancias[orden[v]] = 0
 	dic_distancias[orden[v]] += 1

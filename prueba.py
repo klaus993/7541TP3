@@ -189,4 +189,4 @@ def grafeo():
 	grafo.agregar_arista("Joaquin", "Juan")
 	comunidades(grafo)
 
-estadisticas(grafo)
+distancias(grafo, "BLACK PANTHER")
