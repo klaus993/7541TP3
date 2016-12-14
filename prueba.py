@@ -16,9 +16,17 @@ def generar_distancias(v, padre, orden, dic_distancias):
 def distancias(grafo, personaje):
 	''' Recibe un grafo y el identificador de un vértice. Imprime por pantalla
 	la cantidad de personajes que se encuentran a cada una de las distancias
-	posibles. '''
+	posibles del vértice recibido por parámetro. '''
+	padre, orden = grafo.recorrer("bfs", None, None, personaje)
 	dic_distancias = {}
-	grafo.recorrer("bfs", generar_distancias, dic_distancias, personaje)
+	for clave, valor in orden.items():
+		if valor == 0: continue
+		aux = clave #uso el aux para no modificar la clave del diccionario orden
+		while(padre[aux]): aux = padre[aux]
+		if(aux != personaje): continue
+		if valor not in dic_distancias:
+			dic_distancias[valor] = 0
+		dic_distancias[valor] += 1 
 	for clave,valor in dic_distancias.items():
 		print("Distancia "+ str(clave)+": "+str(valor))
 
@@ -184,9 +192,7 @@ def grafeo():
 	grafo.agregar_arista("Gaston", "Gonza")
 	grafo.agregar_arista("Ezequiel", "Cano")
 	grafo.agregar_arista("Cano", "Joaquin")
-	grafo.agregar_arista("Martin", "Gaston")
-	grafo.agregar_arista("Martin", "Ezequiel")
 	grafo.agregar_arista("Joaquin", "Juan")
-	comunidades(grafo)
+	distancias(grafo,"Fede")
 
-distancias(grafo, "BLACK PANTHER")
+distancias(grafo,"BLACK PANTHER")

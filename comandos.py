@@ -132,27 +132,22 @@ def centralidad_random_walks(grafo, cantidad):
 	random_walks(grafo, None, cantidad, 500, 250, adyacentes=True)
 
 
-def generar_distancias(v, padre, orden, dic_distancias):
-	'''Función que recibe un vértice, un diccionario desde el cual se puede
-	acceder al padre del vértice, otro desde el cual se puede acceder a su orden
-	y uno más donde se almacenan las distancias y la cantidad de vértices que
-	cumplen esa distancia a un origen como valores. La función agrega justamente
-	a este último diccionario la distancia del vértice y le aumenta en uno
-	su valor. '''
-	print (v,)
-	if orden[v] not in dic_distancias:
-		dic_distancias[orden[v]] = 0
-	dic_distancias[orden[v]] += 1
-
-
 def distancias(grafo, personaje):
 	''' Recibe un grafo y el identificador de un vértice. Imprime por pantalla
 	la cantidad de personajes que se encuentran a cada una de las distancias
-	posibles. '''
+	posibles del vértice recibido por parámetro. '''
+	padre, orden = grafo.recorrer("bfs", None, None, personaje)
 	dic_distancias = {}
-	grafo.recorrer("bfs", generar_distancias, dic_distancias, personaje)
-	for clave, valor in dic_distancias.items():
-		print("Distancia " + str(clave) + ": " + str(valor))
+	for clave, valor in orden.items():
+		if valor == 0: continue
+		aux = clave #uso el aux para no modificar la clave del diccionario orden
+		while(padre[aux]): aux = padre[aux]
+		if(aux != personaje): continue
+		if valor not in dic_distancias:
+			dic_distancias[valor] = 0
+		dic_distancias[valor] += 1 
+	for clave,valor in dic_distancias.items():
+		print("Distancia "+ str(clave)+": "+str(valor))
 
 
 def calcular_vertices(grafo):
