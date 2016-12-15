@@ -259,7 +259,7 @@ def listas_de_comunidades(grafo, label_d):
 
 def comunidades(grafo):
 	''' Calcula e imprime las comunidades del grafo, realizando el algoritmo
-	label propagation 30 veces sobre un grafo.i
+	label propagation 30 veces sobre un grafo.
 	Filtra las comunidades con menos de 4 personajes y más de 1000.
 	'''
 	label_d = label_propagation(grafo, 30)
