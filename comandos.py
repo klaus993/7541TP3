@@ -308,12 +308,8 @@ def generar_caminos_minimos(grafo):
 
 
 def centralidad_exacta(grafo, cantidad):
-<<<<<<< HEAD
-	pass
-=======
 	cont = generar_caminos_minimos(grafo)
 	centrales = sorted(cont, key=cont.get, reverse=True)[:cantidad]
 	for i in range(len(centrales) - 1):
 		print(centrales[i], end=', ')
 	print(centrales[len(centrales) - 1])
->>>>>>> 4d7b942c2f15da9a937d22075bac32befee83e4f
